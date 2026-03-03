@@ -349,7 +349,7 @@ namespace BingoMode.BingoChallenges
                 case "LC_second": return "Bronze";
                 case "SU_filt": return "Light Pink";
                 case "MS": return "Dull Yellow";
-                case "WARG_AUDIO_GROOVE": return "Pink";
+                case "WARG_AUDIO_GROOVE": return "audio";
                 case "WSKD_AUDIO_JAM2": return "audio";
                 case "WSKC_ABSTRACT": return "Dark Teal";
                 case "WBLA_AUDIO_VOICEWIND1": return "audio";

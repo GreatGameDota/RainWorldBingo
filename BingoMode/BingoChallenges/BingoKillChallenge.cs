@@ -101,7 +101,8 @@ namespace BingoMode.BingoChallenges
             {
                 Watcher.WatcherEnums.CreatureTemplateType.SandGrub,
                 Watcher.WatcherEnums.CreatureTemplateType.BigSandGrub,
-                Watcher.WatcherEnums.CreatureTemplateType.FireSprite
+                Watcher.WatcherEnums.CreatureTemplateType.FireSprite,
+                CreatureType.SmallNeedleWorm
             };
         }
 

@@ -38,6 +38,21 @@ namespace BingoMode.BingoChallenges
             cache.Clear();
         }
 
+        //public static void PrintCache()
+        //{
+        //    Plugin.logger.LogInfo("List rules defines " + ListRules.Count + " lists");
+        //    int counter = 1;
+        //    foreach (var thing in cache.Keys)
+        //    {
+        //        Plugin.logger.LogInfo($"({counter})List: " + thing.listname);
+        //        foreach (var item in cache[thing])
+        //        {
+        //            Plugin.logger.LogInfo($"{item}");
+        //        }
+        //        counter++;
+        //    }
+        //}
+
         public static string[] GetFilteredList(string listname, string[] origList, bool sorted)
         {
             var key = (listname, ExpeditionData.slugcatPlayer, sorted);

@@ -115,7 +115,7 @@ namespace BingoMode
                 new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
             }
 
-            // Temp fix for warp points that are sealed near landing locations (ONLY NARNIA)
+            // Temp fix for warp points that are sealed near landing locations
             IL.Watcher.WarpPoint.Update += WarpPoint_Update;
             // Slideshows load existing save rather than loading new (mainly for visiting ST in bath on first cycle, thanks salty_syrup)
             IL.Menu.SlideShow.ctor += SlideShow_ctor;
@@ -136,15 +136,18 @@ namespace BingoMode
                 x => x.MatchLdarg(0),
                 x => x.MatchCallOrCallvirt("Watcher.WarpPoint", "get_warpSequenceInProgress")))
             {
-                c.Emit(OpCodes.Pop);
                 c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<Func<WarpPoint, bool>>((wp) =>
+                c.EmitDelegate<Func<bool, WarpPoint, bool>>((origWarpSequenceInProgress, wp) =>
                 {
-                    if (wp?.Data?.destRoom != null && wp.Data.destRoom == "NARNIA")
+                    if (wp?.room?.game != null)
                     {
-                        return false;
+                        // If the player is landing in a room that is not the warp point room, warp sequence in progress shouldn't matter for sealing
+                        if (wp.room.abstractRoom != wp.room.game.FirstAlivePlayer.Room)
+                        {
+                            return false;
+                        }
                     }
-                    return true;
+                    return origWarpSequenceInProgress;
                 });
             }
             else Plugin.logger.LogError("WarpPoint_Update FAIULRE " + il);

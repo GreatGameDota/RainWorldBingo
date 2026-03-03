@@ -87,7 +87,7 @@ namespace BingoMode.BingoChallenges
                 phrase.InsertWord(new Counter(current, amount.Value), 2);
                 if (oneCycle.Value)
                 {
-                    phrase.InsertWord(new Icon("cycle_limit"), 0);
+                    phrase.InsertWord(new Icon("cycle_limit"), 2);
                 }
             }
             else

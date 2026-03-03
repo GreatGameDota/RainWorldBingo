@@ -1544,13 +1544,13 @@ namespace BingoMode.BingoChallenges
         // false prevents a death flower from spawning
         public static bool Player_PlaceKarmaFlower_get(orig_PlaceKarmaFlower orig, Player self)
         {
-            if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge ||
-                        (x is BingoItemHoardChallenge c && c.target.Value == "KarmaFlower" && (c.TeamsCompleted[SteamTest.team] || c.completed)) ||
-                        (x is BingoCraftChallenge c2 && c2.craftee.Value == "KarmaFlower" && (c2.TeamsCompleted[SteamTest.team] || c2.completed)) ||
-                        (x is BingoStealChallenge c3 && c3.subject.Value == "KarmaFlower" && (c3.TeamsCompleted[SteamTest.team] || c3.completed))))
-            {
-                return orig.Invoke(self);
-            }
+            //if (ExpeditionData.challengeList.Any(x => x is BingoKarmaFlowerChallenge ||
+            //            (x is BingoItemHoardChallenge c && c.target.Value == "KarmaFlower" && (c.TeamsCompleted[SteamTest.team] || c.completed)) ||
+            //            (x is BingoCraftChallenge c2 && c2.craftee.Value == "KarmaFlower" && (c2.TeamsCompleted[SteamTest.team] || c2.completed)) ||
+            //            (x is BingoStealChallenge c3 && c3.subject.Value == "KarmaFlower" && (c3.TeamsCompleted[SteamTest.team] || c3.completed))))
+            //{
+            //    return orig.Invoke(self);
+            //}
             
             return false;
         }
