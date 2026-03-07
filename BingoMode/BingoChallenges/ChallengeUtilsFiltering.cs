@@ -112,9 +112,9 @@ namespace BingoMode.BingoChallenges
                         .Where(x =>
                             (slug == watchername ? watcherTolls.Contains(x) : !watcherTolls.Contains(x))
 
-                            && (slug == artiname ? artiTolls.Contains(x) : !artiTolls.Contains(x))
+                            && (slug == artiname || !artiTolls.Contains(x))
 
-                            && (slug == saintname ? saintTolls.Contains(x) : !saintTolls.Contains(x))
+                            && (slug == saintname || !saintTolls.Contains(x))
 
                             && (slug == gourname || slug == monkname || slug == survivorname || !oeTolls.Contains(x))
                         )

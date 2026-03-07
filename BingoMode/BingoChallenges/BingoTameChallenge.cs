@@ -150,12 +150,12 @@ namespace BingoMode.BingoChallenges
 
         public override void Reset()
         {
-            base.Reset();
             current = 0;
             tamedTypes?.Clear();
             tamedTypes = [];
             tamedIDs?.Clear();
             tamedIDs = [];
+            base.Reset();
         }
 
         public override string ToString()

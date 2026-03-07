@@ -1226,22 +1226,18 @@ namespace BingoMode.BingoChallenges
                 c.Emit(OpCodes.Ldarg_1);
                 c.EmitDelegate<Action<Weapon>>((weapon) =>
                 {
-                    if (weapon.thrownBy != null && weapon.thrownBy is Player p)
+                    if (weapon.thrownBy is not Player p) return;
+
+                    if (p.slugcatStats.name == MoreSlugcatsEnums.SlugcatStatsName.Spear && weapon is Spear spear)
                     {
-                        if (p.slugcatStats.name == MoreSlugcatsEnums.SlugcatStatsName.Spear && weapon is Spear spear)
+                        if (!spear.IsNeedle || (spear.spearmasterNeedle_fadecounter != spear.spearmasterNeedle_fadecounter_max)) return;
+                    }
+
+                    foreach (var challenge in ExpeditionData.challengeList)
+                    {
+                        if (challenge is BingoPopcornChallenge c)
                         {
-                            if (spear.IsNeedle)
-                            {
-                                if (spear.spearmasterNeedle_fadecounter != spear.spearmasterNeedle_fadecounter_max) return;
-                            }
-                            else return;
-                        }
-                        for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
-                        {
-                            if (ExpeditionData.challengeList[j] is BingoPopcornChallenge c)
-                            {
-                                c.Pop();
-                            }
+                            c.Pop();
                         }
                     }
                 });
@@ -1551,8 +1547,14 @@ namespace BingoMode.BingoChallenges
             //{
             //    return orig.Invoke(self);
             //}
-            
-            return false;
+            if (BingoData.BingoMode)
+            {
+                return false;
+            }
+            else
+            {
+                return orig(self);
+            }
         }
 
         public static void Room_LoadedUnlock(ILContext il)

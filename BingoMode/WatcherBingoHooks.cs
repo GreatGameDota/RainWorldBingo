@@ -268,7 +268,11 @@ namespace BingoMode
                     {"Barnacle", 4},
                     {"BoxWorm", 12},
                     {"BigMoth", 8},
-                    {"BigSandGrub", 4}
+                    {"BigSandGrub", 4},
+                    // add dlc shared (gets removed below if msc on)
+                    {"SpitLizard", 11},
+                    {"EelLizard", 6},
+                    {"ZoopLizard",6}
                 };
 
                 foreach (KeyValuePair<string, int> keyValuePair in newDict)

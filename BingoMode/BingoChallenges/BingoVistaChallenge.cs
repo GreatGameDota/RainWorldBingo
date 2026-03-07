@@ -78,7 +78,7 @@ namespace BingoMode.BingoChallenges
 
             for (int i = 0; i < this.game.Players.Count; i++)
             {
-                if (this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].realizedCreature.room.abstractRoom.name == ActualRoomName(room.Value) && Vector2.Distance(this.game.Players[i].realizedCreature.mainBodyChunk.pos, this.location) < 30f)
+                if (this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].realizedCreature.room.abstractRoom.name.ToUpperInvariant() == ActualRoomName(room.Value).ToUpperInvariant() && Vector2.Distance(this.game.Players[i].realizedCreature.mainBodyChunk.pos, this.location) < 30f)
                 {
                     this.CompleteChallenge();
                     return;
@@ -131,7 +131,7 @@ namespace BingoMode.BingoChallenges
             }
             ValueTuple<string, string> valueTuple = list[UnityEngine.Random.Range(0, list.Count)];
             string item = valueTuple.Item1;
-            string item2 = valueTuple.Item2;
+            string item2 = valueTuple.Item2.ToUpperInvariant();
             Vector2 vector = ChallengeUtils.BingoVistaLocations[item][item2];
             BingoVistaChallenge vistaChallenge = new BingoVistaChallenge
             {
