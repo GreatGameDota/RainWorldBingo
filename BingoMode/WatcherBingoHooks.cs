@@ -733,10 +733,8 @@ namespace BingoMode
             if (c.TryGotoNext(MoveType.After,
                 x => x.MatchCallOrCallvirt(typeof(List<string>).GetProperty("Item").GetGetMethod()),
                 x => x.MatchCallOrCallvirt(typeof(string).GetMethod(nameof(string.ToLowerInvariant))),
-                x => x.MatchCallOrCallvirt(typeof(List<string>).GetMethod(nameof(List<string>.Contains))),
-                x => x.MatchStloc(out _)))
+                x => x.MatchCallOrCallvirt(typeof(List<string>).GetMethod(nameof(List<string>.Contains)))))
             {
-                c.Index--;
                 c.EmitDelegate<Func<bool, bool>>(containsResult =>
                 {
                     if (BingoData.BingoMode &&

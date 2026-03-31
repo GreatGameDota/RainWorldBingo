@@ -312,15 +312,21 @@ namespace BingoMode.BingoChallenges
                 "regions",
                 (slug, baselist) =>
                 {
-                    return new[] { "Any Region" }.Concat(SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"))
-                    .Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToArray();
+                    string[] watcherForbid = { "SU", "CC", "HI", "SH" };
+                    List<string> mutableBase = new List<string>{ "Any Region" }.Concat(SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"))
+                    .Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToList();
+                    if (slug == watchername) mutableBase = mutableBase.Where(x => !watcherForbid.Contains(x)).ToList();
+                    return mutableBase.ToArray();
                 }
             },
             {
                 "regionsreal",
                 (slug, baselist) =>
                 {
-                    return SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToArray();
+                    string[] watcherForbid = { "SU", "CC", "HI", "SH" };
+                    List<string> mutableBase = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToList();
+                    if (slug == watchername) mutableBase = mutableBase.Where(x => !watcherForbid.Contains(x)).ToList();
+                    return mutableBase.ToArray();
                 }
             },
             {
