@@ -1610,7 +1610,7 @@ namespace BingoMode.BingoChallenges
         {
             ILCursor c = new(il);
             if (c.TryGotoNext(MoveType.After,
-                x => x.MatchLdloc(89),
+                x => x.MatchLdloc(88),
                 x => x.MatchCallOrCallvirt(typeof(List<PlacedObject>).GetMethod("get_Item")),
                 x => x.MatchLdfld<PlacedObject>("active")
                 ))
