@@ -115,6 +115,16 @@ namespace BingoMode
                 new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
             }
 
+            {
+                var targetProperty = typeof(RippleTree).GetProperty("GoalScale");
+
+                var targetGetter = targetProperty?.GetGetMethod(false);
+
+                var hookMethod = RippleTree_GoalScale;
+
+                new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
+            }
+
             // Temp fix for warp points that are sealed near landing locations
             IL.Watcher.WarpPoint.Update += WarpPoint_Update;
             // Slideshows load existing save rather than loading new (mainly for visiting ST in bath on first cycle, thanks salty_syrup)
@@ -127,6 +137,7 @@ namespace BingoMode
             IL.Watcher.SpinningTop.MarkSpinningTopEncountered += SpinningTop_MarkSpinningTopEncountered;
             // Allow waua karma flower to spawn even while you haven't beaten ST
             On.KarmaFlower.CanSpawnKarmaFlower += KarmaFlower_CanSpawnKarmaFlower;
+
         }
 
         private static void WarpPoint_Update(ILContext il)
@@ -1008,11 +1019,20 @@ namespace BingoMode
 
         private static int RegionState_RippleSpawnEggState_WarpEggThreshold(Func<int> orig)
         {
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (ModManager.Watcher && BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 return Plugin.PluginInstance.BingoConfig.DialAmount.Value;
             }
             return orig();
+        }
+
+        private static float RippleTree_GoalScale(Func<RippleTree, float> orig, RippleTree self)
+        {
+            if (ModManager.Watcher && BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                return 1f;
+            }
+            return orig(self);
         }
 
         private static void SlideShow_ctor(ILContext il)
