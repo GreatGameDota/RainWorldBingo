@@ -104,6 +104,7 @@ namespace BingoMode
             {
                 dialWarpPerkInstance
             });
+
             // Set warp egg threshold
             {
                 var targetProperty = typeof(RegionState.RippleSpawnEggState).GetProperty("WarpEggThreshold", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
@@ -121,6 +122,16 @@ namespace BingoMode
                 var targetGetter = targetProperty?.GetGetMethod(false);
 
                 var hookMethod = RippleTree_GoalScale;
+
+                new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
+            }
+
+            {
+                var targetProperty = typeof(Player).GetProperty("rippleSpawnEggReveal");
+
+                var targetGetter = targetProperty?.GetGetMethod(false);
+
+                var hookMethod = Player_rippleSpawnEggReveal;
 
                 new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
             }
@@ -1028,9 +1039,18 @@ namespace BingoMode
 
         private static float RippleTree_GoalScale(Func<RippleTree, float> orig, RippleTree self)
         {
-            if (ModManager.Watcher && BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (ModManager.Watcher && BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher && !ExpeditionGame.activeUnlocks.Contains("unl-watcher-dialwarp"))
             {
                 return 1f;
+            }
+            return orig(self);
+        }
+
+        private static float Player_rippleSpawnEggReveal(Func<Player, float> orig, Player self)
+        {
+            if (ModManager.Watcher && BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher && ExpeditionGame.activeUnlocks.Contains("unl-watcher-dialwarp"))
+            {
+                return 600f;
             }
             return orig(self);
         }

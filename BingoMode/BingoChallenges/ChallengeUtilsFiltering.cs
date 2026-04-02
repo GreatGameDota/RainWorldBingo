@@ -312,7 +312,7 @@ namespace BingoMode.BingoChallenges
                 "regions",
                 (slug, baselist) =>
                 {
-                    string[] watcherForbid = { "SU", "CC", "HI", "SH" };
+                    string[] watcherForbid = { "SU", "CC", "HI", "SH", "WDSR", "WGWR", "WHIR", "WSUR" };
                     List<string> mutableBase = new List<string>{ "Any Region" }.Concat(SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"))
                     .Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToList();
                     if (slug == watchername) mutableBase = mutableBase.Where(x => !watcherForbid.Contains(x)).ToList();
@@ -323,7 +323,7 @@ namespace BingoMode.BingoChallenges
                 "regionsreal",
                 (slug, baselist) =>
                 {
-                    string[] watcherForbid = { "SU", "CC", "HI", "SH" };
+                    string[] watcherForbid = { "SU", "CC", "HI", "SH", "WDSR", "WGWR", "WHIR", "WSUR" };
                     List<string> mutableBase = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToList();
                     if (slug == watchername) mutableBase = mutableBase.Where(x => !watcherForbid.Contains(x)).ToList();
                     return mutableBase.ToArray();
