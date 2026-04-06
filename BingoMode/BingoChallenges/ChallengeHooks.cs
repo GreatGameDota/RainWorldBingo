@@ -1013,35 +1013,26 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public static void FriendTracker_Update(On.FriendTracker.orig_Update orig, FriendTracker self)
+        public static void FriendTracker_Update(ILContext il)
         {
-            orig.Invoke(self);
+            ILCursor c = new ILCursor(il);
 
-            // Copied from base game
-            if (self.AI.creature.state.socialMemory != null && self.AI.creature.state.socialMemory.relationShips != null && self.AI.creature.state.socialMemory.relationShips.Count > 0)
+            if (c.TryGotoNext(
+                x => x.MatchStfld<FriendTracker>("friendRel")))
             {
-                for (int j = 0; j < self.AI.creature.state.socialMemory.relationShips.Count; j++)
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Action<FriendTracker>>((self) =>
                 {
-                    if (self.AI.creature.state.socialMemory.relationShips[j].like > 0.5f && self.AI.creature.state.socialMemory.relationShips[j].tempLike > 0.5f)
+                    for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
                     {
-                        for (int k = 0; k < self.AI.creature.Room.creatures.Count; k++)
+                        if (ExpeditionData.challengeList[j] is BingoTameChallenge c)
                         {
-                            if (self.AI.creature.Room.creatures[k].ID == self.AI.creature.state.socialMemory.relationShips[j].subjectID && self.AI.creature.Room.creatures[k].realizedCreature != null)
-                            {
-                                for (int p = 0; p < ExpeditionData.challengeList.Count; p++)
-                                {
-                                    if (ExpeditionData.challengeList[p] is BingoTameChallenge c)
-                                    {
-                                        c.Fren(self.AI.creature);
-                                    }
-                                }
-                                break;
-                            }
+                            c.Fren(self.AI.creature);
                         }
                     }
-                }
-                return;
+                });
             }
+            else Plugin.logger.LogError("Uh oh, FriendTracker_Update il fucked up " + il);
         }
 
         // worldName is being loaded, game.world.region.name is currently loaded. null check to prevent progress check on goals when loading first region

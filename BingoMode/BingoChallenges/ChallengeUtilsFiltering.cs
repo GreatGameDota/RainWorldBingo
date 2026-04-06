@@ -246,7 +246,7 @@ namespace BingoMode.BingoChallenges
                 {
                     List<string> mutableBase = baselist.ToList();
 
-                    string[] noArtiSpearPearls = { "SL_chimney", "SL_bridge", "SL_moon"};
+                    string[] noArtiSpearPearls = { "SL_chimney", "SL_bridge", "SL_moon", "SB_ravine" };
                     string[] artiPearls = { "LC", "LC_second" };
                     string[] saintForbid = { "UW" };
                     string[] spearPearls = { "DM" };

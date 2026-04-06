@@ -5,6 +5,7 @@ using Menu.Remix;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -150,12 +151,12 @@ namespace BingoMode.BingoChallenges
 
         public override void Reset()
         {
-            current = 0;
+            base.Reset();
             tamedTypes?.Clear();
             tamedTypes = [];
             tamedIDs?.Clear();
             tamedIDs = [];
-            base.Reset();
+            current = 0;
         }
 
         public override string ToString()
@@ -208,12 +209,12 @@ namespace BingoMode.BingoChallenges
 
         public override void AddHooks()
         {
-            On.FriendTracker.Update += FriendTracker_Update;
+            IL.FriendTracker.Update += FriendTracker_Update;
         }
 
         public override void RemoveHooks()
         {
-            On.FriendTracker.Update -= FriendTracker_Update;
+            IL.FriendTracker.Update -= FriendTracker_Update;
         }
 
         public override List<object> Settings() => [crit, amount, specific];

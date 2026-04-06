@@ -115,7 +115,7 @@ namespace BingoMode
 
                 new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
             }
-
+            // If dial warp perk is disabled, set ripple trees to always be fully grown
             {
                 var targetProperty = typeof(RippleTree).GetProperty("GoalScale");
 
@@ -125,7 +125,7 @@ namespace BingoMode
 
                 new MonoMod.RuntimeDetour.Hook(targetGetter, hookMethod);
             }
-
+            // If dial warp perk is enabled, always allow player to see ripplespawn (the 600f comes from playergraphics inverse lerp, I assume it's generally the max)
             {
                 var targetProperty = typeof(Player).GetProperty("rippleSpawnEggReveal");
 
