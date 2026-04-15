@@ -45,10 +45,9 @@ namespace BingoMode.BingoChallenges
         }
     }
 
-    public class BingoScoreChallenge : BingoChallenge
+    public class BingoScoreChallenge : BingoOneCycleChallenge
     {
         public SettingBox<int> target;
-        public SettingBox<bool> oneCycle;
 
         public int score;
 
@@ -155,22 +154,6 @@ namespace BingoMode.BingoChallenges
                     CompleteChallenge();
                 }
                 else ChangeValue();
-            }
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (revealed || completed || !oneCycle.Value) return;
-            if (this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
-            {
-                if (this.score != 0)
-                {
-                    this.score = 0;
-                    this.UpdateDescription();
-                    ChangeValue();
-                }
-                return;
             }
         }
 

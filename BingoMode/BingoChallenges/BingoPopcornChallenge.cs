@@ -40,13 +40,12 @@ namespace BingoMode.BingoChallenges
         }
     }
 
-    public class BingoPopcornChallenge : BingoChallenge
+    public class BingoPopcornChallenge : BingoOneCycleChallenge
     {
         public int current;
         public SettingBox<int> amount;
         public SettingBox<string> region;
         public SettingBox<bool> differentRegions;
-        public SettingBox<bool> oneCycle;
         public List<string> popRegions = [];
 
         public BingoPopcornChallenge()
@@ -121,22 +120,6 @@ namespace BingoMode.BingoChallenges
             ch.differentRegions = new(UnityEngine.Random.value < 0.3f, "Different Regions", 2);
             ch.oneCycle = new(false, "In one Cycle", 3);
             return ch;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (revealed || completed) return;
-            if (game?.cameras[0]?.room?.shelterDoor != null && game.cameras[0].room.shelterDoor.IsClosing)
-            {
-                if (current != 0 && oneCycle.Value)
-                {
-                    Reset();
-                    UpdateDescription();
-                    ChangeValue();
-                }
-                return;
-            }
         }
 
         public void Pop()

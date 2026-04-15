@@ -72,7 +72,7 @@ namespace BingoMode.BingoChallenges
         }
     }
 
-    public class BingoKillChallenge : BingoChallenge
+    public class BingoKillChallenge : BingoOneCycleChallenge
     {
         public SettingBox<string> crit;
         public SettingBox<string> weapon;
@@ -81,7 +81,6 @@ namespace BingoMode.BingoChallenges
         public SettingBox<string> region;
         public SettingBox<bool> deathPit;
         public SettingBox<bool> starve;
-        public SettingBox<bool> oneCycle;
         public SettingBox<bool> shrooms;
 
         public List<CreatureTemplate.Type> allowedSmallCrits;
@@ -216,20 +215,6 @@ namespace BingoMode.BingoChallenges
                 deathPit = new(false, "Via a Death Pit", 7),
                 shrooms = new(false, "While under mushroom effect", 8)
             };
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (!completed && oneCycle.Value && this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
-            {
-                if (current != 0)
-                {
-                    current = 0;
-                    UpdateDescription();
-                }
-                return;
-            }
         }
 
         public void DeathPit(Creature c, Player p)

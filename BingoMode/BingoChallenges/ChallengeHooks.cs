@@ -166,6 +166,22 @@ namespace BingoMode.BingoChallenges
             // Many challenges use this and I want to make it general purpose
             IL.Room.Loaded += Room_LoadedKarmaFlower;
             placeKarmaFlowerHook = new(typeof(Player).GetProperty("PlaceKarmaFlower", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetGetMethod(), Player_PlaceKarmaFlower_get);
+
+            // This is for BingoOneCycleChallenge
+            On.SaveState.SessionEnded += SaveState_SessionEnded;
+        }
+
+        public static void SaveState_SessionEnded(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
+        {
+            Plugin.logger.LogInfo("Session ended");
+            for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
+            {
+                if (ExpeditionData.challengeList[j] is BingoOneCycleChallenge c)
+                {
+                    c.EndCycle();
+                }
+            }
+            orig.Invoke(self, game, survived, newMalnourished);
         }
 
         public static bool Scavenger_GrabTrade(On.Scavenger.orig_Grab orig, Scavenger self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)

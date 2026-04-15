@@ -15,13 +15,12 @@ namespace BingoMode.BingoChallenges
 {
     using static ChallengeHooks;
 
-    public class WatcherBingoHatchMothGrubChallenge : BingoChallenge
+    public class WatcherBingoHatchMothGrubChallenge : BingoOneCycleChallenge
     {
         public int current;
         public SettingBox<int> amount;
         public SettingBox<string> region;
         public SettingBox<bool> differentRegions;
-        public SettingBox<bool> oneCycle;
         public List<string> hatchRegions = [];
 
         public WatcherBingoHatchMothGrubChallenge()
@@ -68,22 +67,6 @@ namespace BingoMode.BingoChallenges
             ch.amount = new(UnityEngine.Random.Range(1, 3), "Amount", 0);
             ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "At once", 1);
             return ch;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (revealed || completed) return;
-            if (game?.cameras[0]?.room?.shelterDoor != null && game.cameras[0].room.shelterDoor.IsClosing)
-            {
-                if (current != 0 && oneCycle.Value)
-                {
-                    Reset();
-                    UpdateDescription();
-                    ChangeValue();
-                }
-                return;
-            }
         }
 
         public void Hatch()

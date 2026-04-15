@@ -30,7 +30,7 @@ namespace BingoMode.BingoChallenges
             challenge.weapon.Value = weapon.Random();
             challenge.victim.Value = victim.Random();
             challenge.amount.Value = amount.Random();
-            challenge.inOneCycle.Value = inOneCycle.Random();
+            challenge.oneCycle.Value = inOneCycle.Random();
             challenge.region.Value = region.Random();
             return challenge;
         }
@@ -58,12 +58,11 @@ namespace BingoMode.BingoChallenges
         }
     }
 
-    public class BingoDamageChallenge : BingoChallenge
+    public class BingoDamageChallenge : BingoOneCycleChallenge
     {
         public SettingBox<string> weapon;
         public SettingBox<string> victim;
         public SettingBox<int> amount;
-        public SettingBox<bool> inOneCycle;
         public SettingBox<string> region;
         public List<string> frogsThrown;
         public int current;
@@ -73,7 +72,7 @@ namespace BingoMode.BingoChallenges
             weapon = new("", "Weapon", 0, listName: "weapons");
             victim = new("", "Creature Type", 1, listName: "creatures");
             amount = new(0, "Amount", 2);
-            inOneCycle = new(false, "In One Cycle", 3);
+            oneCycle = new(false, "In One Cycle", 3);
             region = new("", "Region", 4, listName: "regions");
             frogsThrown = [];
         }
@@ -91,7 +90,7 @@ namespace BingoMode.BingoChallenges
                 .Replace("<weapon>", ChallengeTools.ItemName(new(weapon.Value)))
                 .Replace("<current>", ValueConverter.ConvertToString(current))
                 .Replace("<amount>", ValueConverter.ConvertToString(amount.Value))
-                .Replace("<onecycle>", inOneCycle.Value ? ChallengeTools.IGT.Translate(" in one cycle") : "");
+                .Replace("<onecycle>", oneCycle.Value ? ChallengeTools.IGT.Translate(" in one cycle") : "");
             base.UpdateDescription();
         }
 
@@ -109,7 +108,7 @@ namespace BingoMode.BingoChallenges
             }
 
             phrase.InsertWord(new Counter(current, amount.Value), lastLine);
-            if (inOneCycle.Value) phrase.InsertWord(new Icon("cycle_limit"), lastLine);
+            if (oneCycle.Value) phrase.InsertWord(new Icon("cycle_limit"), lastLine);
             return phrase;
         }
 
@@ -150,7 +149,7 @@ namespace BingoMode.BingoChallenges
                 weapon = new(wep, "Weapon", 0, listName: "weapons"),
                 victim = new(crit, "Creature Type", 1, listName: "creatures"),
                 amount = new(amound, "Amount", 2),
-                inOneCycle = new(oneCycle, "In One Cycle", 3),
+                oneCycle = new(oneCycle, "In One Cycle", 3),
                 region = new("Any Region", "Region", 4, listName: "regions"),
                 frogsThrown = []
             };
@@ -194,22 +193,6 @@ namespace BingoMode.BingoChallenges
             }
         }
 
-        public override void Update()
-        {
-            base.Update();
-            if (revealed || completed) return;
-            if (this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
-            {
-                if (this.current != 0 && this.inOneCycle.Value)
-                {
-                    this.current = 0;
-                    this.UpdateDescription();
-                    ChangeValue();
-                }
-                return;
-            }
-        }
-
         public override int Points()
         {
             return 20;
@@ -239,7 +222,7 @@ namespace BingoMode.BingoChallenges
                 "><",
                 amount.ToString(),
                 "><",
-                inOneCycle.ToString(),
+                oneCycle.ToString(),
                 "><",
                 region.ToString(),
                 "><",
@@ -257,11 +240,11 @@ namespace BingoMode.BingoChallenges
                 weapon = SettingBoxFromString(array[0]) as SettingBox<string>;
                 victim = SettingBoxFromString(array[1]) as SettingBox<string>;
                 amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                inOneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                oneCycle = SettingBoxFromString(array[4]) as SettingBox<bool>;
                 region = SettingBoxFromString(array[5]) as SettingBox<string>;
                 completed = (array[6] == "1");
                 revealed = (array[7] == "1");
-                current = (inOneCycle.Value && !completed) ? 0 : int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                current = (oneCycle.Value && !completed) ? 0 : int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                 UpdateDescription();
             }
             catch (Exception ex)
@@ -293,6 +276,6 @@ namespace BingoMode.BingoChallenges
             On.Watcher.Frog.Attach -= Frog_Attach;
         }
 
-        public override List<object> Settings() => [weapon, amount, region, victim, inOneCycle];
+        public override List<object> Settings() => [weapon, amount, region, victim, oneCycle];
     }
 }

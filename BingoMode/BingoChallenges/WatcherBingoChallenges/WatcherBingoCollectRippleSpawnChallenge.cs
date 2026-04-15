@@ -13,11 +13,10 @@ using UnityEngine;
 namespace BingoMode.BingoChallenges.WatcherBingoChallenges
 {
     using static ChallengeHooks;
-    public class WatcherBingoCollectRippleSpawnChallenge : BingoChallenge
+    public class WatcherBingoCollectRippleSpawnChallenge : BingoOneCycleChallenge
     {
         public int current;
         public SettingBox<int> amount;
-        public SettingBox<bool> oneCycle;
 
         public WatcherBingoCollectRippleSpawnChallenge()
         {
@@ -59,22 +58,6 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
             ch.amount = new(UnityEngine.Random.Range(2, 26), "Amount", 0);
             ch.oneCycle = new(UnityEngine.Random.value < 0.2f, "In one Cycle", 1);
             return ch;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (revealed || completed) return;
-            if (this.game?.cameras[0]?.room?.shelterDoor != null && this.game.cameras[0].room.shelterDoor.IsClosing)
-            {
-                if (this.current != 0 && this.oneCycle.Value)
-                {
-                    this.current = 0;
-                    this.UpdateDescription();
-                    ChangeValue();
-                }
-                return;
-            }
         }
 
         public void Pop()
