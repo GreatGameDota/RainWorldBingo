@@ -75,6 +75,7 @@ namespace BingoMode.BingoChallenges
         {
             if (hidden || revealed || TeamsCompleted[SteamTest.team] || completed) return;
             string to = warpPoint.room.abstractRoom.name.ToUpperInvariant();
+            string from = warpPoint.Data.destRoom.ToUpperInvariant();
             string warp = "";
 
             foreach (var portal in ChallengeUtils.watcherPortals)
@@ -92,10 +93,12 @@ namespace BingoMode.BingoChallenges
                     warp = spot;
             }
 
-            // dynamic warp
+            // dynamic warp, we use a lexicographical sort to make sure that going either way through a dyn warp counts as the same warp (there is no real notion of to and from, just the constituent ends)
             if (warp == "")
             {
-                warp = "DYNAMICENTRY-" + to;
+                string[] toFromSorted = new string[] { to, from };
+                Array.Sort(toFromSorted);
+                warp = "DYNAMICENTRY-" + toFromSorted[0] + "-" + toFromSorted[1];
             }
 
             
