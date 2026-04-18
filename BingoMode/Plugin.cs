@@ -25,11 +25,12 @@ namespace BingoMode
     using BingoHUD;
     using BingoSteamworks;
 
-    [BepInPlugin(ID, "Bingo", VERSION)]
+    [BepInPlugin(ID, NAME, VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string VERSION = "2.08";
-        public const string ID = "nacu_shrub.bingomode";
+        public const string VERSION = "2.09";
+        public const string ID = "nacu_shrub.bingomodebeta";
+        public const string NAME = "Bingo Beta";
         public static bool AppliedAlreadyDontDoItAgainPlease;
         public static bool AppliedAlreadyDontDoItAgainPleasePartTwo;
         internal static ManualLogSource logger;

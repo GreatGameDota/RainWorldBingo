@@ -74,7 +74,7 @@ namespace BingoMode.BingoChallenges
             if (ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Saint && region == "DS") region = "UG";
             if ((ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Spear || ExpeditionData.slugcatPlayer == MoreSlugcatsEnums.SlugcatStatsName.Artificer) && region == "MS") region = "GW";
 
-            this.description = specific.Value ? ChallengeTools.IGT.Translate("Collect the <pearl> pearl from <region>")
+            this.description = specific.Value ? ChallengeTools.IGT.Translate("Touch the <pearl> pearl in <region>")
                 .Replace("<region>", ChallengeTools.IGT.Translate(Region.GetRegionFullName(region, ExpeditionData.slugcatPlayer)))
                 .Replace("<pearl>", ChallengeTools.IGT.Translate(ChallengeUtils.NameForPearl(pearl.Value)))
                 : ChallengeTools.IGT.Translate("Collect [<current>/<amount>] colored pearls")
@@ -103,7 +103,7 @@ namespace BingoMode.BingoChallenges
 
         public override string ChallengeName()
         {
-            return ChallengeTools.IGT.Translate("Collecting pearls");
+            return ChallengeTools.IGT.Translate("Touching pearls");
         }
 
         public void PickedUp(PearlType type)
