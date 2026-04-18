@@ -87,7 +87,7 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = anyShelter.Value ?
-                new Phrase([[target.Value == "KarmaFlower" ? Icon.KARMA_FLOWER : Icon.FromEntityName(target.Value), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("doubleshelter")]]):
+                new Phrase([[target.Value == "KarmaFlower" ? Icon.KARMA_FLOWER : Icon.FromEntityName(target.Value), new Icon(Plugin.PluginInstance.BingoConfig.FillIcons.Value ? "keyShiftB" : "keyShiftA", 1f, Color.white, 90), new Icon("doubleshelter")]]) :
                 new Phrase([[new Icon("ShelterMarker"), target.Value == "KarmaFlower" ? Icon.KARMA_FLOWER : Icon.FromEntityName(target.Value)]]);
             int lastLine = 1;
             if (region.Value != "Any Region")
@@ -146,7 +146,7 @@ namespace BingoMode.BingoChallenges
         public override void Update()
         {
             base.Update();
-            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || Custom.rainWorld.processManager.upcomingProcess != null)  return;
+            if (completed || revealed || TeamsCompleted[SteamTest.team] || hidden || Custom.rainWorld.processManager.upcomingProcess != null) return;
             for (int i = 0; i < this.game.Players.Count; i++)
             {
                 if (this.game.Players[i] != null && this.game.Players[i].realizedCreature != null && this.game.Players[i].realizedCreature.room != null && this.game.Players[i].Room.shelter)
@@ -243,15 +243,42 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                anyShelter = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[2]) as SettingBox<int>;
-                target = SettingBoxFromString(array[3]) as SettingBox<string>;
-                region = SettingBoxFromString(array[4]) as SettingBox<string>;
-                completed = (array[5] == "1");
-                revealed = (array[6] == "1");
-                string[] arr = Regex.Split(array[7], "cLtD");
+                if (array.Length == 4)
+                {
+                    anyShelter = SettingBoxFromString("System.Boolean|false|Any Shelter|2|NULL") as SettingBox<bool>;
+                    current = int.Parse("0", NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[0]) as SettingBox<int>;
+                    target = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    region = SettingBoxFromString("System.String|Any Region|Region|4|regions") as SettingBox<string>;
+                    completed = (array[2] == "1");
+                    revealed = (array[3] == "1");
+                    string[] arr = Regex.Split("", "cLtD");
                     collected = [.. arr];
+                }
+                else if (array.Length == 7)
+                {
+                    anyShelter = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                    current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[2]) as SettingBox<int>;
+                    target = SettingBoxFromString(array[3]) as SettingBox<string>;
+                    region = SettingBoxFromString("System.String|Any Region|Region|4|regions") as SettingBox<string>;
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+                    string[] arr = Regex.Split(array[6], "cLtD");
+                    collected = [.. arr];
+                }
+                else
+                {
+                    anyShelter = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                    current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[2]) as SettingBox<int>;
+                    target = SettingBoxFromString(array[3]) as SettingBox<string>;
+                    region = SettingBoxFromString(array[4]) as SettingBox<string>;
+                    completed = (array[5] == "1");
+                    revealed = (array[6] == "1");
+                    string[] arr = Regex.Split(array[7], "cLtD");
+                    collected = [.. arr];
+                }
                 UpdateDescription();
             }
             catch (Exception ex)

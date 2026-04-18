@@ -130,12 +130,12 @@ namespace BingoMode.BingoChallenges
         {
             return false;
         }
-    
+
         public override int Points()
         {
             return 20;// Mathf.RoundToInt(6 * FoodDifficultyMultiplier()) * amountRequired.Value * (hidden ? 2 : 1);
         }
-    
+
         //public float FoodDifficultyMultiplier()
         //{
         //    switch (foodType.Value)
@@ -150,7 +150,7 @@ namespace BingoMode.BingoChallenges
         //
         //    return 1f;
         //}
-    
+
         public void FoodEated(IPlayerEdible thisEdibleIsShit, Player playuh)
         {
             if (!completed && !TeamsCompleted[SteamTest.team] && !hidden && !revealed && thisEdibleIsShit is PhysicalObject p &&
@@ -190,19 +190,36 @@ namespace BingoMode.BingoChallenges
                 revealed ? "1" : "0",
             });
         }
-    
+
         public override void FromString(string args)
         {
             try
             {
                 string[] array = Regex.Split(args, "><");
-                amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                isCreature = (array[2] == "1");
-                foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
-                completed = (array[5] == "1");
-                revealed = (array[6] == "1");
+                if (array.Length == 6)
+                {
+                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
+                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    isCreature = (array[2] == "1");
+                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+
+                    starve = SettingBoxFromString("System.Boolean|false|While Starving|2|NULL") as SettingBox<bool>;
+                }
+                else
+                {
+                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
+                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    isCreature = (array[2] == "1");
+                    string[] _parts = array[3].Split('|');
+                    _parts[_parts.Length - 1] = "food"; // Old boards using "Wfood"
+                    array[3] = string.Join("|", _parts);
+                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
+                    starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
+                    completed = (array[5] == "1");
+                    revealed = (array[6] == "1");
+                }
                 UpdateDescription();
             }
             catch (Exception ex)

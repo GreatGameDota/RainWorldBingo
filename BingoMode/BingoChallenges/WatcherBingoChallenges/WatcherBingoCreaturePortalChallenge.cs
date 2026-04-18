@@ -84,7 +84,7 @@ namespace BingoMode.BingoChallenges
                 if (parts[0] == to || parts[1] == to)
                     warp = portal;
             }
-            
+
 
             foreach (var spot in ChallengeUtils.watcherSTSpots)
             {
@@ -101,7 +101,7 @@ namespace BingoMode.BingoChallenges
                 warp = "DYNAMICENTRY-" + toFromSorted[0] + "-" + toFromSorted[1];
             }
 
-            
+
             List<AbstractCreature> foundCreatures = [];
             bool addedPortalCreatures = false;
 
@@ -240,6 +240,9 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
+                string[] _parts = array[0].Split('|');
+                _parts[_parts.Length - 1] = "transport"; // Old boards using "Wtransport"
+                array[0] = string.Join("|", _parts);
                 crit = SettingBoxFromString(array[0]) as SettingBox<string>;
                 current = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
                 amount = SettingBoxFromString(array[2]) as SettingBox<int>;

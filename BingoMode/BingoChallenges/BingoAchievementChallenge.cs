@@ -135,6 +135,9 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
+                string[] _parts = array[0].Split('|');
+                _parts[_parts.Length - 1] = "passage"; // Old boards using "Wpassage"
+                array[0] = string.Join("|", _parts);
                 ID = SettingBoxFromString(array[0]) as SettingBox<string>;
                 completed = (array[1] == "1");
                 revealed = (array[2] == "1");

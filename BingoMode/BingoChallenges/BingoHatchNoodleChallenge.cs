@@ -220,14 +220,31 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                region = SettingBoxFromString(array[0]) as SettingBox<string>;
-                differentRegions = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[4]) as SettingBox<int>;
-                hatchRegions = [.. array[5].Split('|')];
-                completed = (array[6] == "1");
-                revealed = (array[7] == "1");
+                if (array.Length == 5)
+                {
+                    region = SettingBoxFromString("System.String|Any Region|Region|1|nootregions") as SettingBox<string>;
+                    differentRegions = SettingBoxFromString("System.Boolean|false|Different Regions|2|NULL") as SettingBox<bool>;
+                    current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[1]) as SettingBox<int>;
+                    oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                    hatchRegions = [.. "".Split('|')];
+                    completed = (array[3] == "1");
+                    revealed = (array[4] == "1");
+                }
+                else
+                {
+                    string[] _parts = array[0].Split('|');
+                    _parts[_parts.Length - 1] = "nootregions"; // Old boards using "regions"
+                    array[0] = string.Join("|", _parts);
+                    region = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    differentRegions = SettingBoxFromString(array[1]) as SettingBox<bool>;
+                    oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[4]) as SettingBox<int>;
+                    hatchRegions = [.. array[5].Split('|')];
+                    completed = (array[6] == "1");
+                    revealed = (array[7] == "1");
+                }
                 UpdateDescription();
             }
             catch (Exception ex)

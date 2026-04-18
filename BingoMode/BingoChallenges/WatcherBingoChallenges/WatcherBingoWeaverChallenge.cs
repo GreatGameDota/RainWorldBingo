@@ -109,6 +109,9 @@ namespace BingoMode.BingoChallenges
             {
                 string[] array = Regex.Split(args, "><");
                 region = array[0];
+                string[] _parts = array[1].Split('|');
+                _parts[_parts.Length - 1] = "weaverrooms"; // Old boards using "WweaverRooms"
+                array[1] = string.Join("|", _parts);
                 room = SettingBoxFromString(array[1]) as SettingBox<string>;
                 completed = (array[2] == "1");
                 revealed = (array[3] == "1");

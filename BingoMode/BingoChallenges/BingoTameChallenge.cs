@@ -188,16 +188,59 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                crit = SettingBoxFromString(array[1]) as SettingBox<string>;
-                current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                completed = (array[4] == "1");
-                revealed = (array[5] == "1");
-                string[] arr = Regex.Split(array[6], @"cLtDT");
-                tamedTypes = [.. arr];
-                string[] arr2 = Regex.Split(array[7], @"cLtDID");
-                tamedIDs = [.. arr2];
+                if (array.Length == 3)
+                {
+                    crit = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    completed = (array[1] == "1");
+                    revealed = (array[2] == "1");
+
+                    specific = SettingBoxFromString("System.Boolean|true|Specific Creature Type|0|NULL") as SettingBox<bool>;
+                    current = int.Parse("0", NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString("System.Int32|1|Amount|3|NULL") as SettingBox<int>;
+                    string[] arr = Regex.Split("", @"cLtDT");
+                    tamedTypes = [.. arr];
+                    string[] arr2 = Regex.Split("", @"cLtDID");
+                    tamedIDs = [.. arr2];
+                }
+                else if (array.Length == 7)
+                {
+                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                    string[] _parts = array[1].Split('|');
+                    _parts[_parts.Length - 1] = "friend";
+                    array[1] = string.Join("|", _parts);
+                    crit = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    if (specific.Value)
+                    {
+                        amount = SettingBoxFromString("System.Int32|1|Amount|2|NULL") as SettingBox<int>;
+                    }
+                    else
+                    {
+                        amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                    }
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+                    string[] arr = Regex.Split(array[6], @"cLtDT");
+                    tamedTypes = [.. arr];
+                    string[] arr2 = Regex.Split("", @"cLtDID");
+                    tamedIDs = [.. arr2];
+                }
+                else
+                {
+                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
+                    string[] _parts = array[1].Split('|');
+                    _parts[_parts.Length - 1] = "friend"; // Old boards using "Wfriend"
+                    array[1] = string.Join("|", _parts);
+                    crit = SettingBoxFromString(array[1]) as SettingBox<string>;
+                    current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[3]) as SettingBox<int>;
+                    completed = (array[4] == "1");
+                    revealed = (array[5] == "1");
+                    string[] arr = Regex.Split(array[6], @"cLtDT");
+                    tamedTypes = [.. arr];
+                    string[] arr2 = Regex.Split(array[7], @"cLtDID");
+                    tamedIDs = [.. arr2];
+                }
                 UpdateDescription();
             }
             catch (Exception ex)
