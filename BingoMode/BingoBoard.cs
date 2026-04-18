@@ -428,7 +428,7 @@ namespace BingoMode
             }
             if (tempSquaresD1 > squares) squares = tempSquaresD1;
 
-            theOutInQuestion:
+        theOutInQuestion:
             // Diagonal line 2
             int tempSquaresD2 = 0;
             for (int i = 0; i < size; i++)
@@ -457,7 +457,8 @@ namespace BingoMode
                 try
                 {
                     return BingoRandomizationProfile.GetChallenge();
-                } catch (Exception)
+                }
+                catch (Exception)
                 {
                     Plugin.logger.LogMessage("Error getting challenge from randomizer, resorting to default generation.");
                 }
@@ -552,17 +553,17 @@ namespace BingoMode
 
         public void RecreateFromList()
         {
-            
-             
+
+
             if (recreateList != null && Mathf.RoundToInt(Mathf.Sqrt(recreateList.Count)) == size)
             {
-                 
+
                 challengeGrid = new Challenge[size, size];
                 int next = 0;
                 for (int j = 0; j < size; j++)
                     for (int i = 0; i < size; i++)
                         challengeGrid[i, j] = recreateList[next++];
-                
+
                 SteamTest.UpdateOnlineBingo();
                 UpdateChallenges();
             }
@@ -591,7 +592,7 @@ namespace BingoMode
             string text = ExpeditionData.slugcatPlayer.value + ";" + BingoData.BingoDen + ";" + string.Join("bChG", ExpeditionData.challengeList);
             return text;
         }
-        
+
         public bool FromString(string text)
         {
             bool success = true;
@@ -640,7 +641,55 @@ namespace BingoMode
                             string[] array11 = Regex.Split(challenges[next], "~");
                             string type = array11[0];
                             string text2 = array11[1];
-                            Challenge challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
+                            Challenge challenge;
+                            if (type == "BingoAllRegionsExcept")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoAllRegionsExceptChallenge").GetType());
+                            }
+                            else if (type == "BingoGlobalScoreChallenge" || type == "BingoCycleScoreChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoScoreChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoCollectPearlChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoCollectPearlChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoEatChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoEatChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoTameChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoTameChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoBombTollChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoBombTollChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoAchievementChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoAchievementChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoStealChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoStealChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoDontUseItemChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoDontUseItemChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoEnterRegionChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoEnterRegionChallenge").GetType());
+                            }
+                            else if (type == "WatcherBingoNoRegionChallenge")
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == "BingoNoRegionChallenge").GetType());
+                            }
+                            else
+                            {
+                                challenge = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
+                            }
                             challenge.FromString(text2);
                             ExpLog.Log(challenge.description);
                             if (!ExpeditionData.allChallengeLists.ContainsKey(ExpeditionData.slugcatPlayer))

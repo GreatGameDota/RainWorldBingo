@@ -72,7 +72,8 @@ namespace BingoMode.BingoChallenges
         public override Phrase ConstructPhrase()
         {
             Phrase phrase = new([[new Icon("foodSymbol"), Icon.KARMA_FLOWER]]);
-            if (differentRegions.Value) {
+            if (differentRegions.Value)
+            {
                 phrase.InsertWord(new Icon("TravellerA"));
                 phrase.InsertWord(new Counter(current, amount.Value), 1);
                 if (oneCycle.Value)
@@ -211,14 +212,29 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
-                region = SettingBoxFromString(array[0]) as SettingBox<string>;
-                differentRegions = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[4]) as SettingBox<int>;
-                eatRegions = [.. array[5].Split('|')];
-                completed = (array[6] == "1");
-                revealed = (array[7] == "1");
+                if (array.Length == 4)
+                {
+                    current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[1]) as SettingBox<int>;
+                    completed = (array[2] == "1");
+                    revealed = (array[3] == "1");
+
+                    region = SettingBoxFromString("System.String|Any Region|Region|1|regions") as SettingBox<string>;
+                    differentRegions = SettingBoxFromString("System.Boolean|false|Different Regions|2|NULL") as SettingBox<bool>;
+                    oneCycle = SettingBoxFromString("System.Boolean|false|In one Cycle|3|NULL") as SettingBox<bool>;
+                    eatRegions = [.. "".Split('|')];
+                }
+                else
+                {
+                    region = SettingBoxFromString(array[0]) as SettingBox<string>;
+                    differentRegions = SettingBoxFromString(array[1]) as SettingBox<bool>;
+                    oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
+                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
+                    amount = SettingBoxFromString(array[4]) as SettingBox<int>;
+                    eatRegions = [.. array[5].Split('|')];
+                    completed = (array[6] == "1");
+                    revealed = (array[7] == "1");
+                }
                 UpdateDescription();
             }
             catch (Exception ex)

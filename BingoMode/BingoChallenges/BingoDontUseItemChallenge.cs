@@ -121,7 +121,7 @@ namespace BingoMode.BingoChallenges
             if (isFood) return;
             for (int i = 0; i < BingoData.heldItemsTime.Length; i++)
             {
-                if (i == (int)new AbstractPhysicalObject.AbstractObjectType(item.Value) && BingoData.heldItemsTime[i] > 200) Used(new(item.Value)); 
+                if (i == (int)new AbstractPhysicalObject.AbstractObjectType(item.Value) && BingoData.heldItemsTime[i] > 200) Used(new(item.Value));
             }
             for (int i = 0; i < game.Players.Count; i++)
             {
@@ -173,6 +173,9 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
+                string[] _parts = array[0].Split('|');
+                _parts[_parts.Length - 1] = "banitem"; // Old boards using "Wbanitem"
+                array[0] = string.Join("|", _parts);
                 item = SettingBoxFromString(array[0]) as SettingBox<string>;
                 isFood = (array[1] == "1");
                 completed = (array[2] == "1");

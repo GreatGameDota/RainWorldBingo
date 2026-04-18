@@ -171,6 +171,9 @@ namespace BingoMode.BingoChallenges
             try
             {
                 string[] array = Regex.Split(args, "><");
+                string[] _parts = array[0].Split('|');
+                _parts[_parts.Length - 1] = "theft"; // Old boards using "Wtheft"
+                array[0] = string.Join("|", _parts);
                 subject = SettingBoxFromString(array[0]) as SettingBox<string>;
                 toll = SettingBoxFromString(array[1]) as SettingBox<bool>;
                 current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
