@@ -198,30 +198,15 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                if (array.Length == 4)
-                {
-                    ghost = SettingBoxFromString(array[0]) as SettingBox<string>;
-                    starve = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                    completed = (array[2] == "1");
-                    revealed = (array[3] == "1");
-
-                    specific = SettingBoxFromString("System.Boolean|true|Specific Echo|0|NULL") as SettingBox<bool>;
-                    current = int.Parse("0", NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString("System.Int32|3|Amount|1|NULL") as SettingBox<int>;
-                    visited = [.. "".Split('|')];
-                }
-                else
-                {
-                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                    ghost = SettingBoxFromString(array[1]) as SettingBox<string>;
-                    starve = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString(array[4]) as SettingBox<int>;
-                    completed = (array[5] == "1");
-                    revealed = (array[6] == "1");
-                    visited = [.. array[7].Split('|')];
-                }
+                var fields = ChallengeUtilsDeserializer.Parse("echo", args);
+                specific = SettingBoxFromString(fields["Specific"]) as SettingBox<bool>;
+                ghost = SettingBoxFromString(fields["Ghost"]) as SettingBox<string>;
+                starve = SettingBoxFromString(fields["Starve"]) as SettingBox<bool>;
+                current = int.Parse(fields["Current"], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(fields["Amount"]) as SettingBox<int>;
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
+                visited = [.. fields["Visited"].Split('|')];
                 UpdateDescription();
             }
             catch (System.Exception ex)

@@ -179,31 +179,14 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                if (array.Length == 3)
-                {
-                    score = int.Parse("0", NumberStyles.Any, CultureInfo.InvariantCulture);
-                    target = SettingBoxFromString(array[0]) as SettingBox<int>;
-                    completed = (array[1] == "1");
-                    revealed = (array[2] == "1");
-                    oneCycle = SettingBoxFromString("System.Boolean|true|In one Cycle|1|NULL") as SettingBox<bool>;
-                }
-                else if (array.Length == 4)
-                {
-                    score = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    target = SettingBoxFromString(array[1]) as SettingBox<int>;
-                    completed = (array[2] == "1");
-                    revealed = (array[3] == "1");
-                    oneCycle = SettingBoxFromString("System.Boolean|false|In one Cycle|1|NULL") as SettingBox<bool>;
-                }
-                else
-                {
-                    score = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    target = SettingBoxFromString(array[1]) as SettingBox<int>;
-                    oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                    completed = (array[3] == "1");
-                    revealed = (array[4] == "1");
-                }
+                var fields = ChallengeUtilsDeserializer.Parse("score", args);
+
+                score = int.Parse(fields["Score"], NumberStyles.Any, CultureInfo.InvariantCulture);
+                target = SettingBoxFromString(fields["Target"]) as SettingBox<int>;
+                oneCycle = SettingBoxFromString(fields["OneCycle"]) as SettingBox<bool>;
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
+
                 UpdateDescription();
             }
             catch (Exception ex)

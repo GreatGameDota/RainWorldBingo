@@ -172,15 +172,13 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                string[] _parts = array[0].Split('|');
-                _parts[_parts.Length - 1] = "banitem"; // Old boards using "Wbanitem"
-                array[0] = string.Join("|", _parts);
-                item = SettingBoxFromString(array[0]) as SettingBox<string>;
-                isFood = (array[1] == "1");
-                completed = (array[2] == "1");
-                revealed = (array[3] == "1");
-                isCreature = array[4] == "1";
+                var fields = ChallengeUtilsDeserializer.Parse("dontuseitem", args);
+
+                item = SettingBoxFromString(fields["Item"]) as SettingBox<string>;
+                isFood = fields["IsFood"] == "1";
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
+                isCreature = fields["IsCreature"] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

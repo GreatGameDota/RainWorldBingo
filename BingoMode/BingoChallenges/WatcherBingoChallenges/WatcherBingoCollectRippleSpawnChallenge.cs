@@ -114,23 +114,13 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                if (array.Length == 4)
-                {
-                    current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString(array[1]) as SettingBox<int>;
-                    oneCycle = SettingBoxFromString("System.Boolean|false|In one Cycle|1|NULL") as SettingBox<bool>;
-                    completed = (array[2] == "1");
-                    revealed = (array[3] == "1");
-                }
-                else
-                {
-                    current = int.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString(array[1]) as SettingBox<int>;
-                    oneCycle = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                    completed = (array[3] == "1");
-                    revealed = (array[4] == "1");
-                }
+                var fields = ChallengeUtilsDeserializer.Parse("collectripplespawn", args);
+
+                current = int.Parse(fields["Current"], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(fields["Amount"]) as SettingBox<int>;
+                oneCycle = SettingBoxFromString(fields["OneCycle"]) as SettingBox<bool>;
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)
