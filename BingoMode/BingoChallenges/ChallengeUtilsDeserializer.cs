@@ -432,7 +432,7 @@ namespace BingoMode.BingoChallenges
                     {
                         fields["Score"] = "0";
                         fields["Target"] = segs[0];
-                        fields["OneCycle"] = "System.Boolean|false|In one Cycle|1|NULL";
+                        fields["OneCycle"] = "System.Boolean|true|In one Cycle|1|NULL";
                         fields["Completed"] = segs[1];
                         fields["Revealed"] = segs[2];
                     }
