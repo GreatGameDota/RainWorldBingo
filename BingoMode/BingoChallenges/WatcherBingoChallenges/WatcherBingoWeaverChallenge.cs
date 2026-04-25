@@ -107,14 +107,12 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                region = array[0];
-                string[] _parts = array[1].Split('|');
-                _parts[_parts.Length - 1] = "weaverrooms"; // Old boards using "WweaverRooms"
-                array[1] = string.Join("|", _parts);
-                room = SettingBoxFromString(array[1]) as SettingBox<string>;
-                completed = (array[2] == "1");
-                revealed = (array[3] == "1");
+                var fields = ChallengeUtilsDeserializer.Parse("weaver", args);
+
+                region = fields["Region"];
+                room = SettingBoxFromString(fields["Room"]) as SettingBox<string>;
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
                 UpdateDescription();
             }
             catch (System.Exception ex)

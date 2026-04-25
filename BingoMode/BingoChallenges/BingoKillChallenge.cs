@@ -340,35 +340,19 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                if (!array[8].Contains("mushroom"))
-                {
-                    crit = SettingBoxFromString(array[0]) as SettingBox<string>;
-                    weapon = SettingBoxFromString(array[1]) as SettingBox<string>;
-                    amount = SettingBoxFromString(array[2]) as SettingBox<int>;
-                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    region = SettingBoxFromString(array[4]) as SettingBox<string>;
-                    oneCycle = SettingBoxFromString(array[6]) as SettingBox<bool>;
-                    deathPit = SettingBoxFromString(array[7]) as SettingBox<bool>;
-                    starve = SettingBoxFromString(array[8]) as SettingBox<bool>;
-                    shrooms = SettingBoxFromString("System.Boolean|false|While under mushroom effect|8|NULL") as SettingBox<bool>;
-                    completed = (array[9] == "1");
-                    revealed = (array[10] == "1");
-                }
-                else
-                {
-                    crit = SettingBoxFromString(array[0]) as SettingBox<string>;
-                    weapon = SettingBoxFromString(array[1]) as SettingBox<string>;
-                    amount = SettingBoxFromString(array[2]) as SettingBox<int>;
-                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    region = SettingBoxFromString(array[4]) as SettingBox<string>;
-                    oneCycle = SettingBoxFromString(array[5]) as SettingBox<bool>;
-                    deathPit = SettingBoxFromString(array[6]) as SettingBox<bool>;
-                    starve = SettingBoxFromString(array[7]) as SettingBox<bool>;
-                    shrooms = SettingBoxFromString(array[8]) as SettingBox<bool>;
-                    completed = (array[9] == "1");
-                    revealed = (array[10] == "1");
-                }
+                var fields = ChallengeUtilsDeserializer.Parse("kill", args);
+
+                crit = SettingBoxFromString(fields["Crit"]) as SettingBox<string>;
+                weapon = SettingBoxFromString(fields["Weapon"]) as SettingBox<string>;
+                amount = SettingBoxFromString(fields["Amount"]) as SettingBox<int>;
+                current = int.Parse(fields["Current"], NumberStyles.Any, CultureInfo.InvariantCulture);
+                region = SettingBoxFromString(fields["Region"]) as SettingBox<string>;
+                oneCycle = SettingBoxFromString(fields["OneCycle"]) as SettingBox<bool>;
+                deathPit = SettingBoxFromString(fields["DeathPit"]) as SettingBox<bool>;
+                starve = SettingBoxFromString(fields["Starve"]) as SettingBox<bool>;
+                shrooms = SettingBoxFromString(fields["Shrooms"]) as SettingBox<bool>;
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

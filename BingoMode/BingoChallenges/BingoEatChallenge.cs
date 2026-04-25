@@ -195,31 +195,15 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                if (array.Length == 6)
-                {
-                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    isCreature = (array[2] == "1");
-                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                    completed = (array[4] == "1");
-                    revealed = (array[5] == "1");
+                var fields = ChallengeUtilsDeserializer.Parse("eat", args);
 
-                    starve = SettingBoxFromString("System.Boolean|false|While Starving|2|NULL") as SettingBox<bool>;
-                }
-                else
-                {
-                    amountRequired = SettingBoxFromString(array[0]) as SettingBox<int>;
-                    currentEated = int.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    isCreature = (array[2] == "1");
-                    string[] _parts = array[3].Split('|');
-                    _parts[_parts.Length - 1] = "food"; // Old boards using "Wfood"
-                    array[3] = string.Join("|", _parts);
-                    foodType = SettingBoxFromString(array[3]) as SettingBox<string>;
-                    starve = SettingBoxFromString(array[4]) as SettingBox<bool>;
-                    completed = (array[5] == "1");
-                    revealed = (array[6] == "1");
-                }
+                amountRequired = SettingBoxFromString(fields["Amount"]) as SettingBox<int>;
+                currentEated = int.Parse(fields["Current"], NumberStyles.Any, CultureInfo.InvariantCulture);
+                isCreature = fields["IsCreature"] == "1";
+                foodType = SettingBoxFromString(fields["FoodType"]) as SettingBox<string>;
+                starve = SettingBoxFromString(fields["Starve"]) as SettingBox<bool>;
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
                 UpdateDescription();
             }
             catch (Exception ex)

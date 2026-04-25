@@ -170,16 +170,14 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                string[] _parts = array[0].Split('|');
-                _parts[_parts.Length - 1] = "theft"; // Old boards using "Wtheft"
-                array[0] = string.Join("|", _parts);
-                subject = SettingBoxFromString(array[0]) as SettingBox<string>;
-                toll = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                current = int.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture);
-                amount = SettingBoxFromString(array[3]) as SettingBox<int>;
-                completed = (array[4] == "1");
-                revealed = (array[5] == "1");
+                var fields = ChallengeUtilsDeserializer.Parse("steal", args);
+
+                subject = SettingBoxFromString(fields["Subject"]) as SettingBox<string>;
+                toll = SettingBoxFromString(fields["Toll"]) as SettingBox<bool>;
+                current = int.Parse(fields["Current"], NumberStyles.Any, CultureInfo.InvariantCulture);
+                amount = SettingBoxFromString(fields["Amount"]) as SettingBox<int>;
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
                 checkedIDs = [];
                 UpdateDescription();
             }

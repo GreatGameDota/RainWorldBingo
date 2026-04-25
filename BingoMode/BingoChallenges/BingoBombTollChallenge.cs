@@ -357,37 +357,16 @@ namespace BingoMode.BingoChallenges
         {
             try
             {
-                string[] array = Regex.Split(args, "><");
-                if (array.Length == 4)
-                {
-                    string[] _parts = array[0].Split('|');
-                    _parts[1] = _parts[1].ToUpperInvariant(); // Force uppercase
-                    array[0] = string.Join("|", _parts);
-                    roomName = SettingBoxFromString(array[0]) as SettingBox<string>;
-                    pass = SettingBoxFromString(array[1]) as SettingBox<bool>;
-                    completed = (array[2] == "1");
-                    revealed = (array[3] == "1");
+                var fields = ChallengeUtilsDeserializer.Parse("toll", args);
 
-                    specific = SettingBoxFromString("System.Boolean|true|Specific toll|0|NULL") as SettingBox<bool>;
-                    current = int.Parse("0", NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString("System.Int32|3|Amount|1|NULL") as SettingBox<int>;
-                    bombed = BombedTollsFromString("empty");
-                }
-                else
-                {
-                    specific = SettingBoxFromString(array[0]) as SettingBox<bool>;
-                    string[] _parts = array[1].Split('|');
-                    _parts[1] = _parts[1].ToUpperInvariant(); // Force uppercase
-                    _parts[_parts.Length - 1] = "tolls"; // Old boards using "Wtolls"
-                    array[1] = string.Join("|", _parts);
-                    roomName = SettingBoxFromString(array[1]) as SettingBox<string>;
-                    pass = SettingBoxFromString(array[2]) as SettingBox<bool>;
-                    current = int.Parse(array[3], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    amount = SettingBoxFromString(array[4]) as SettingBox<int>;
-                    bombed = BombedTollsFromString(array[5]);
-                    completed = (array[6] == "1");
-                    revealed = (array[7] == "1");
-                }
+                roomName = SettingBoxFromString(fields["RoomName"]) as SettingBox<string>;
+                pass = SettingBoxFromString(fields["Pass"]) as SettingBox<bool>;
+                specific = SettingBoxFromString(fields["Specific"]) as SettingBox<bool>;
+                amount = SettingBoxFromString(fields["Amount"]) as SettingBox<int>;
+                bombed = BombedTollsFromString(fields["Bombed"]);
+                current = int.Parse(fields["Current"], NumberStyles.Any, CultureInfo.InvariantCulture);
+                completed = fields["Completed"] == "1";
+                revealed = fields["Revealed"] == "1";
             }
             catch (Exception ex)
             {
