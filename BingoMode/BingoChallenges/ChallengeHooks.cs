@@ -173,7 +173,6 @@ namespace BingoMode.BingoChallenges
 
         public static void SaveState_SessionEnded(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
         {
-            Plugin.logger.LogInfo("Session ended");
             for (int j = 0; j < ExpeditionData.challengeList.Count; j++)
             {
                 if (ExpeditionData.challengeList[j] is BingoOneCycleChallenge c)

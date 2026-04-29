@@ -23,6 +23,7 @@ namespace BingoMode
     {
         public static bool BingoMode;
         public static bool MultiplayerGame;
+        public static bool WatcherMode;
         public static Dictionary<SlugcatStats.Name, BingoSaveData> BingoSaves = []; // slug and board size
         public static List<Challenge> availableBingoChallenges;
         public static List<string> challengeTokens = [];
@@ -42,6 +43,8 @@ namespace BingoMode
         public static Dictionary<string, List<string>> pinnableCreatureRegions;
         public static int RandomStartingSeed = -1;
         public static Dictionary<SlugcatStats.Name, List<string>> bannedChallenges = [];
+
+        public static SlugcatStats.Name slugcatPlayer => UseWatcherName();
 
         private static bool? _moonDeadOverride;
 
@@ -504,6 +507,18 @@ namespace BingoMode
             var timeline = data.sourceTimeline ?? SlugcatStats.Timeline.Watcher;
 
             return $"{sourceRoom}:{timeline}:{data.uuidPair}";
+        }
+
+        private static SlugcatStats.Name UseWatcherName()
+        {
+            if (ModManager.Watcher && ExpeditionData.slugcatPlayer != WatcherEnums.SlugcatStatsName.Watcher && BingoData.WatcherMode)
+            {
+                return WatcherEnums.SlugcatStatsName.Watcher;
+            }
+            else
+            {
+                return ExpeditionData.slugcatPlayer;
+            }
         }
     }
 }

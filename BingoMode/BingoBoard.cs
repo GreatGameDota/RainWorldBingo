@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using watcherName =  Watcher.WatcherEnums.SlugcatStatsName;
 
 namespace BingoMode
 {
@@ -40,14 +41,14 @@ namespace BingoMode
         {
             BingoRandomizationProfile.Reset();
             Challenge[,] ghostGrid = new Challenge[size, size];
-            BingoData.FillPossibleTokens(ExpeditionData.slugcatPlayer);
+            BingoData.FillPossibleTokens(BingoData.slugcatPlayer);
             ExpeditionData.ClearActiveChallengeList();
             if (changeSize)
                 ghostGrid = challengeGrid;
 
             challengeGrid = new Challenge[size, size];
 
-            if (UnityEngine.Random.value < 0.0005 && ExpeditionData.slugcatPlayer == SlugcatStats.Name.Red)
+            if (UnityEngine.Random.value < 0.0005 && BingoData.slugcatPlayer == SlugcatStats.Name.Red)
             {
                 BingoHooks.GlobalBoard.FromString(BingoData.normalBingoBoard);
             }
@@ -469,11 +470,11 @@ namespace BingoMode
             }
 
             List<Challenge> list = [];
-            list.AddRange(BingoData.GetAdequateChallengeList(ExpeditionData.slugcatPlayer));
+            list.AddRange(BingoData.GetAdequateChallengeList(BingoData.slugcatPlayer));
 
-            if (!BingoData.bannedChallenges.ContainsKey(ExpeditionData.slugcatPlayer)) BingoData.LoadAllBannedChallengeLists(ExpeditionData.slugcatPlayer);
+            if (!BingoData.bannedChallenges.ContainsKey(BingoData.slugcatPlayer)) BingoData.LoadAllBannedChallengeLists(BingoData.slugcatPlayer);
 
-            list.RemoveAll(x => (type == null || x.GetType() != type.GetType()) && BingoData.bannedChallenges[ExpeditionData.slugcatPlayer].Contains(x.GetType().Name));
+            list.RemoveAll(x => (type == null || x.GetType() != type.GetType()) && BingoData.bannedChallenges[BingoData.slugcatPlayer].Contains(x.GetType().Name));
             if (type != null) list.RemoveAll(x => x.GetType() != type.GetType());
             int tries = 0;
         resette:
@@ -589,7 +590,7 @@ namespace BingoMode
 
         public override string ToString()
         {
-            string text = ExpeditionData.slugcatPlayer.value + ";" + BingoData.BingoDen + ";" + string.Join("bChG", ExpeditionData.challengeList);
+            string text = ExpeditionData.slugcatPlayer.value + ";" + BingoData.WatcherMode + ";" + BingoData.BingoDen + ";" + string.Join("bChG", ExpeditionData.challengeList);
             return text;
         }
 
@@ -608,6 +609,27 @@ namespace BingoMode
                             BingoData.globalMenu.Translate($"Selected slugcat: {ExpeditionData.slugcatPlayer.value}<LINE>").Replace("<LINE>", "\r\n") +
                             BingoData.globalMenu.Translate($"Provided Slugcat: {slug}<LINE><LINE>").Replace("<LINE>", "\r\n") +
                             BingoData.globalMenu.Translate($"Please paste a board from the same slugcat that's currently selected.")));
+                success = false;
+                return success;
+            }
+
+            string watcherMode = text.Substring(0, text.IndexOf(';'));
+            text = text.Substring(text.IndexOf(";") + 1);
+            try
+            {
+                BingoData.WatcherMode = Boolean.Parse(watcherMode);
+            }
+            catch
+            {
+                BingoData.WatcherMode = false; // old save compat
+            }
+            if (!ModManager.Watcher && BingoData.WatcherMode)
+            {
+                BingoData.WatcherMode = false;
+                if (BingoData.globalMenu != null)
+                    BingoData.globalMenu.manager.ShowDialog(new InfoDialog(
+                            BingoData.globalMenu.manager,
+                            BingoData.globalMenu.Translate("Cannot play Watcher Mode without The Watcher enabled!<LINE><LINE>").Replace("<LINE>", "\r\n")));
                 success = false;
                 return success;
             }

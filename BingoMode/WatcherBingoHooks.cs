@@ -148,7 +148,37 @@ namespace BingoMode
             IL.Watcher.SpinningTop.MarkSpinningTopEncountered += SpinningTop_MarkSpinningTopEncountered;
             // Allow waua karma flower to spawn even while you haven't beaten ST
             On.KarmaFlower.CanSpawnKarmaFlower += KarmaFlower_CanSpawnKarmaFlower;
+            // Allow spinning top to spawn during watchermode rather than only as watcher
+            IL.Room.Loaded += Room_LoadedSTLoad;
+            IL.World.SpawnGhost += World_SpawnGhost;
 
+        }
+
+        private static void World_SpawnGhost(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            if (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt(typeof(ExtEnum<SlugcatStats.Name>).GetMethod("op_Equality"))))
+            {
+                c.EmitDelegate<Func<bool, bool>>(orig =>
+                {
+                    return BingoData.WatcherMode || orig;
+                });
+            }
+            else Plugin.logger.LogError("World_SpawnGhost FAIULRE");
+        }
+
+        private static void Room_LoadedSTLoad(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            if (c.TryGotoNext(x => x.MatchLdsfld(typeof(Watcher.WatcherEnums.PlacedObjectType), nameof(Watcher.WatcherEnums.PlacedObjectType.SpinningTopSpot))) &&
+                c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt(typeof(ExtEnum<SlugcatStats.Name>).GetMethod("op_Equality"))))
+            {
+                c.EmitDelegate<Func<bool, bool>>(orig =>
+                {
+                    return BingoData.WatcherMode || orig;
+                });
+            }
+            else Plugin.logger.LogError("Room_LoadedSTLoad FAIULRE");
         }
 
         private static void WarpPoint_Update(ILContext il)
@@ -178,7 +208,7 @@ namespace BingoMode
         private static void SaveState_ctor(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
         {
             orig(self, saveStateNumber, progression);
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (BingoData.BingoMode && BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 self.miscWorldSaveData.camoTutorialCounter++;
                 self.miscWorldSaveData.usedCamoAbility++;
@@ -187,7 +217,7 @@ namespace BingoMode
                 self.miscWorldSaveData.badWarpTutorialCounter++;
                 self.miscWorldSaveData.warpFatigueTutorialCounter++;
                 self.miscWorldSaveData.warpExhaustionTutorialCounter = 5;
-                if (saveStateNumber == WatcherEnums.SlugcatStatsName.Watcher)
+                if (BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
                 {
                     self.deathPersistentSaveData.spinningTopRotEncounter = true;
                     self.miscWorldSaveData.numberOfPrinceEncounters = 5;
@@ -209,7 +239,7 @@ namespace BingoMode
         
         private static void RainWorldGame_GoToDeathScreen(On.RainWorldGame.orig_GoToDeathScreen orig, RainWorldGame self)
         {
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (BingoData.BingoMode && BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 var death = self.GetStorySession.saveState.deathPersistentSaveData;
                 death.karma = (int)((death.rippleLevel - death.minimumRippleLevel) * 2f);
@@ -554,7 +584,7 @@ namespace BingoMode
                 c.EmitDelegate<Func<bool, bool>>(expedition =>
                 {
                     if (BingoData.BingoMode &&
-                        ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+                        BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
                     {
                         return false;
                     }
@@ -715,7 +745,7 @@ namespace BingoMode
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate<Func<bool, Room, bool>>((karma, room) =>
                 {
-                    if (ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+                    if (BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
                     {
                         return false;
                     }
@@ -729,7 +759,7 @@ namespace BingoMode
         {
             SaveState saveState = orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
 
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (BingoData.BingoMode && BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 Dictionary<string, string> watcherMapPortals = BingoData.FillWatcherMapRegions();
                 if (saveState.miscWorldSaveData.discoveredWarpPoints.Count == 0)
@@ -760,7 +790,7 @@ namespace BingoMode
                 c.EmitDelegate<Func<bool, bool>>(containsResult =>
                 {
                     if (BingoData.BingoMode &&
-                        ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+                        BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
                     {
                         return true;
                     }
@@ -784,7 +814,7 @@ namespace BingoMode
         }
         private static Challenge EchoChallenge_Generate(On.Expedition.EchoChallenge.orig_Generate orig, EchoChallenge self)
         {
-            if (ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 //fuck you
                 return new EchoChallenge
@@ -952,7 +982,7 @@ namespace BingoMode
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate<Func<bool, WarpPoint, bool>>((cur, wp) =>
                 {
-                    if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher && wp.Data != null && wp.Data.destRoom != null && wp.Data.destRoom == "NARNIA")
+                    if (BingoData.BingoMode && BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher && wp.Data != null && wp.Data.destRoom != null && wp.Data.destRoom == "NARNIA")
                     {
                         return false;
                     }
@@ -967,7 +997,7 @@ namespace BingoMode
 
         private static void SaveState_ApplyCustomEndGame(On.SaveState.orig_ApplyCustomEndGame orig, SaveState self, RainWorldGame game, bool addFiveCycles)
         {
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (BingoData.BingoMode && BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 self.deathPersistentSaveData.rippleLevel = 5;
             }
@@ -976,7 +1006,7 @@ namespace BingoMode
 
         private static string WarpPoint_ChooseDynamicWarpTarget(On.Watcher.WarpPoint.orig_ChooseDynamicWarpTarget orig, World world, string oldRoom, string targetRegion, bool badWarp, bool spreadingRot, bool playerCreated)
         {
-            if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
+            if (BingoData.BingoMode && BingoData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 List<string> weaverGoalRooms = [];
                 for (int i = 0; i < ExpeditionData.challengeList.Count; i++)

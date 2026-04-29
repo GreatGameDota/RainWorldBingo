@@ -321,12 +321,12 @@ namespace BingoMode.BingoMenu
 
             nowPlaying.text = expMenu.characterSelect.nowPlaying.label.text;
 
-            if (title.element == watcherTitle && ExpeditionData.slugcatPlayer != Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            if (title.element == watcherTitle && BingoData.slugcatPlayer != Watcher.WatcherEnums.SlugcatStatsName.Watcher)
             {
                 title.element = normalTitle;
                 title.shader = Custom.rainWorld.Shaders["MenuText"];
             }
-            if (title.element == normalTitle && ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            if (title.element == normalTitle && BingoData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
             {
                 title.element = watcherTitle;
                 title.shader = Custom.rainWorld.Shaders["Basic"];
@@ -417,7 +417,7 @@ namespace BingoMode.BingoMenu
                 {
                     int tries = 0;
                 reset:
-                    ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, ExpeditionData.slugcatPlayer);
+                    ExpeditionData.startingDen = ExpeditionRandomStartsUnlocked(menu.manager.rainWorld, BingoData.slugcatPlayer);
                     BingoData.BingoDen = ExpeditionData.startingDen;
 
                     if (bannedRegions.Count > 0)
@@ -430,7 +430,7 @@ namespace BingoMode.BingoMenu
                                 BingoData.BingoDen = "SU_S01";
                                 ExpeditionData.startingDen = "SU_S01";
                             }
-                            else if (ExpeditionData.startingDen.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2).ToLowerInvariant() == banned.ToLowerInvariant())
+                            else if (ExpeditionData.startingDen.Substring(0, BingoData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2).ToLowerInvariant() == banned.ToLowerInvariant())
                             {
                                 tries++;
                                 goto reset;

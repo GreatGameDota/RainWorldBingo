@@ -222,7 +222,6 @@ namespace BingoMode.BingoMenu
                     offset + new Vector2((WIDTH + MARGIN) / 2f, COPY_PASTE_Y),
                     new Vector2(COPY_PASTE_WDITH, COPY_PASTE_HEIGHT));
             subObjects.Add(pasteBoard);
-
         }
 
         public override void Singal(MenuObject sender, string message)

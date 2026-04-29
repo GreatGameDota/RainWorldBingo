@@ -135,7 +135,7 @@ namespace BingoMode.BingoChallenges
             gibacj:
             int type;
 
-            if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            if (BingoData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
             {
                 int[] allowed = { 0, 1, 3 };
                 type = allowed[UnityEngine.Random.Range(0, allowed.Length)];
