@@ -127,7 +127,7 @@ namespace BingoMode.BingoMenu
             slider.subtleSliderNob.outerCircle.alpha = 0f;
             pages[0].subObjects.Add(slider);
 
-            testList = [.. BingoData.GetValidChallengeList(ExpeditionData.slugcatPlayer)];
+            testList = [.. BingoData.GetValidChallengeList(BingoData.slugcatPlayer)];
             testLabels = new TypeButton[testList.Count];
             for (int i = 0; i < testList.Count; i++)
             {
@@ -324,7 +324,7 @@ namespace BingoMode.BingoMenu
             }
             else if (owner.challenge is BingoVistaChallenge ccc)
             {
-                ccc.region = ccc.room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2).ToUpperInvariant();
+                ccc.region = ccc.room.Value.Substring(0, ccc.room.Value.IndexOf("_")).ToUpperInvariant();
                 
                 ccc.location = ChallengeUtils.BingoVistaLocations[ccc.region][ccc.room.Value.ToUpperInvariant()];
                 BingoVistaChallenge.ModifyVistaPositions(ccc);

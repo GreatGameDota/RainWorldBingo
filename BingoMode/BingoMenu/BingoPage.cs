@@ -193,6 +193,8 @@ namespace BingoMode.BingoMenu
                 eggButton.size = eggButton.roundedRect.size;
                 subObjects.Add(eggButton);
             }
+
+            if (!ExpeditionGame.activeUnlocks.Contains("unl-glow")) ExpeditionGame.activeUnlocks.Add("unl-glow");
         }
 
         public void UpdateLobbyHost(bool isHost)

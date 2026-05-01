@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BingoMode.BingoChallenges;
+using Expedition;
 using Menu;
 using Steamworks;
 using System;

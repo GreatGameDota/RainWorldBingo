@@ -74,7 +74,7 @@ namespace BingoMode.BingoMenu
             slider.subtleSliderNob.outerCircle.alpha = 0f;
             pages[0].subObjects.Add(slider);
 
-            testList = [.. BingoData.GetAdequateChallengeList(ExpeditionData.slugcatPlayer)];
+            testList = [.. BingoData.GetAdequateChallengeList(BingoData.slugcatPlayer)];
             testLabels = new TypeButton[testList.Count];
             for (int i = 0; i < testList.Count; i++)
             {
