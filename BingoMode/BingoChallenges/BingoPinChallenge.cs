@@ -112,7 +112,7 @@ namespace BingoMode.BingoChallenges
                     tries += 1;
                     goto shitGoBack;
                 };
-                regions = BingoData.pinnableCreatureRegions[c].Where(x => x.StartsWith(ExpeditionData.slugcatPlayer.value)).ToList();
+                regions = BingoData.pinnableCreatureRegions[c].Where(x => x.StartsWith(BingoData.slugcatPlayer.value)).ToList();
             }
             float radom = Random.value; // Radom mentioned
             if (radom < 0.7f && regions.Count > 0) r = regions[Random.Range(0, regions.Count)];

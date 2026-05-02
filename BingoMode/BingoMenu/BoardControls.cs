@@ -1,4 +1,6 @@
-﻿using Menu;
+﻿using BingoMode.BingoChallenges;
+using Expedition;
+using Menu;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -6,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Watcher;
+using static BingoMode.BingoMenu.BingoMenuObjects;
 
 namespace BingoMode.BingoMenu
 {
@@ -19,6 +23,7 @@ namespace BingoMode.BingoMenu
         private SymbolButton filter;
         private SymbolButton randomize;
         private SymbolButton shuffle;
+        private BingoSymbolButton watcherMode;
 
         private float anchorX;
         public float AnchorX
@@ -28,6 +33,7 @@ namespace BingoMode.BingoMenu
             {
                 anchorX = value;
                 Vector2 offset = new(Mathf.Lerp(0f, -WIDTH, anchorX), Mathf.Lerp(0f, -HEIGHT, anchorY));
+                watcherMode.pos = offset - new Vector2(BUTTON_SIZE + MARGIN, 0f);
                 filter.pos = offset;
                 randomize.pos = offset + new Vector2(BUTTON_SIZE + MARGIN, 0f);
                 shuffle.pos = offset + new Vector2(2f * BUTTON_SIZE + 2f * MARGIN, 0f);
@@ -41,6 +47,7 @@ namespace BingoMode.BingoMenu
             {
                 anchorY = value;
                 Vector2 offset = new(Mathf.Lerp(0f, -WIDTH, anchorX), Mathf.Lerp(0f, -HEIGHT, anchorY));
+                watcherMode.pos = offset - new Vector2(BUTTON_SIZE + MARGIN, 0f);
                 filter.pos = offset;
                 randomize.pos = offset + new Vector2(BUTTON_SIZE + MARGIN, 0f);
                 shuffle.pos = offset + new Vector2(2f * BUTTON_SIZE + 2f * MARGIN, 0f);
@@ -53,7 +60,7 @@ namespace BingoMode.BingoMenu
                 filter.buttonBehav.greyedOut = !value;
                 randomize.buttonBehav.greyedOut = !value;
                 shuffle.buttonBehav.greyedOut = !value;
-                
+                watcherMode.buttonBehav.greyedOut = !value;
             }
         }
 
@@ -63,6 +70,21 @@ namespace BingoMode.BingoMenu
             this.anchorY = anchorY;
             Vector2 offset = new(Mathf.Lerp(0f, -WIDTH, anchorX), Mathf.Lerp(0f, -HEIGHT, anchorY));
             Vector2 size = Vector2.one * BUTTON_SIZE;
+
+            if (ModManager.Watcher && ExpeditionData.slugcatPlayer != Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                watcherMode = new(
+                    menu,
+                    this,
+                    "Kill_Slugcat",
+                    "WATCHERMODE",
+                    offset - new Vector2(BUTTON_SIZE + MARGIN, 0f),
+                    PlayerGraphics.SlugcatColor(Watcher.WatcherEnums.SlugcatStatsName.Watcher),
+                    PlayerGraphics.SlugcatColor(Watcher.WatcherEnums.SlugcatStatsName.Watcher))
+                { size = size };
+                watcherMode.roundedRect.size = size;
+                subObjects.Add(watcherMode);
+            }
 
             filter = new(
                     menu,
@@ -98,6 +120,16 @@ namespace BingoMode.BingoMenu
 
         public override void Singal(MenuObject sender, string message)
         {
+            if (message == "WATCHERMODE")
+            {
+                BingoData.WatcherMode = !BingoData.WatcherMode;
+                watcherMode.spriteColor = BingoData.WatcherMode ? PlayerGraphics.SlugcatColor(ExpeditionData.slugcatPlayer) : PlayerGraphics.SlugcatColor(Watcher.WatcherEnums.SlugcatStatsName.Watcher);
+                watcherMode.roundedRectColor = BingoData.WatcherMode ? PlayerGraphics.SlugcatColor(ExpeditionData.slugcatPlayer) : PlayerGraphics.SlugcatColor(Watcher.WatcherEnums.SlugcatStatsName.Watcher);
+                BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size, false);
+                menu.PlaySound(SoundID.MENU_Next_Slugcat);
+                return;
+            }
+
             if (message == "RANDOMIZE")
             {
                 BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size, false);

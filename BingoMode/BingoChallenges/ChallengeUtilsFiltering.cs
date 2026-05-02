@@ -55,11 +55,11 @@ namespace BingoMode.BingoChallenges
 
         public static string[] GetFilteredList(string listname, string[] origList, bool sorted)
         {
-            var key = (listname, ExpeditionData.slugcatPlayer, sorted);
+            var key = (listname, BingoData.slugcatPlayer, sorted);
 
             if (cache.TryGetValue(key, out var cached)) return cached;
 
-            string[] result = ListRules[listname](ExpeditionData.slugcatPlayer, origList);
+            string[] result = ListRules[listname](BingoData.slugcatPlayer, origList);
 
             if (sorted) result = result.Distinct().OrderBy(x => x).ToArray();
 
@@ -313,8 +313,8 @@ namespace BingoMode.BingoChallenges
                 (slug, baselist) =>
                 {
                     string[] watcherForbid = { "SU", "CC", "HI", "SH", "WDSR", "WGWR", "WHIR", "WSUR" };
-                    List<string> mutableBase = new List<string>{ "Any Region" }.Concat(SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"))
-                    .Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToList();
+                    List<string> mutableBase = new List<string>{ "Any Region" }.Concat(SlugcatStats.SlugcatStoryRegions(BingoData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr"))
+                    .Concat(SlugcatStats.SlugcatOptionalRegions(BingoData.slugcatPlayer)).ToList();
                     if (slug == watchername) mutableBase = mutableBase.Where(x => !watcherForbid.Contains(x)).ToList();
                     return mutableBase.ToArray();
                 }
@@ -324,7 +324,7 @@ namespace BingoMode.BingoChallenges
                 (slug, baselist) =>
                 {
                     string[] watcherForbid = { "SU", "CC", "HI", "SH", "WDSR", "WGWR", "WHIR", "WSUR" };
-                    List<string> mutableBase = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").Concat(SlugcatStats.SlugcatOptionalRegions(ExpeditionData.slugcatPlayer)).ToList();
+                    List<string> mutableBase = SlugcatStats.SlugcatStoryRegions(BingoData.slugcatPlayer).Where(x => x.ToLowerInvariant() != "hr").Concat(SlugcatStats.SlugcatOptionalRegions(BingoData.slugcatPlayer)).ToList();
                     if (slug == watchername) mutableBase = mutableBase.Where(x => !watcherForbid.Contains(x)).ToList();
                     return mutableBase.ToArray();
                 }

@@ -68,7 +68,7 @@ namespace BingoMode.BingoChallenges
         {
             return new Phrase(
                 [[new Icon("vistaicon")],
-                [new Verse(room.Value.Substring(0, ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher ? 4 : 2))]]);
+                [new Verse(room.Value.Substring(0, room.Value.IndexOf("_")))]]);
         }
 
         public override void Update()

@@ -502,7 +502,7 @@ namespace BingoMode.BingoChallenges
             "BasiliskLizard"
         };
 
-        public static readonly string[] PomegranateRegions = { "WTDB", "WARC", "WVWB", "WPGA", "WRRA", "WTDA", "WVWA" };
+        public static readonly string[] PomegranateRegions = { "Any Region", "WTDB", "WARC", "WVWB", "WPGA", "WRRA", "WTDA", "WVWA" };
 
         public static readonly string[] CollectablePearls =
         {

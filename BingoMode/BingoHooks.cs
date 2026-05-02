@@ -386,7 +386,7 @@ namespace BingoMode
                     self.manager.musicPlayer.song.StopAndDestroy();
                     self.manager.musicPlayer.song = null;
                 }
-                if (ExpeditionData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+                if (BingoData.slugcatPlayer == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
                 {
                     self.manager.musicPlayer.MenuRequestsSong("Bingo - Loops around the fast guy", 1f, 1f);
                     self.characterSelect.nowPlaying.label.text = self.Translate("Now Playing:") + "  " + "Loops around the fast guy";

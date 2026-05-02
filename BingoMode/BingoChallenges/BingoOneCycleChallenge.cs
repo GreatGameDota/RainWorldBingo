@@ -14,7 +14,6 @@ namespace BingoMode.BingoChallenges
 
         public void EndCycle()
         {
-            Plugin.logger.LogInfo("Made it to end cycle");
             if (revealed || completed) return;
             if (oneCycle.Value)
             {
