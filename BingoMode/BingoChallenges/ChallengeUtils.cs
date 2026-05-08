@@ -186,7 +186,7 @@ namespace BingoMode.BingoChallenges
                 case ChallengeListConstants.Unlocks: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Unlocks, null, sorted);
                 case ChallengeListConstants.ChatLogs: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.ChatLogs, null, sorted);
                 case ChallengeListConstants.Passage: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Passage, null, sorted);
-                case ChallengeListConstants.ExpObject: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.ExpObject, Storable, sorted);
+                case ChallengeListConstants.ExpObject: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Storable, Storable, sorted);
                 case ChallengeListConstants.Vista: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Vista, null, sorted);
             }
             return ["Whoops something went wrong"];
