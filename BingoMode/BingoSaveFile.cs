@@ -31,19 +31,7 @@ namespace BingoMode
         private static string ExpeditionCoreFile_ToString(On.Expedition.ExpeditionCoreFile.orig_ToString orig, ExpeditionCoreFile self)
         {
             Save();
-            // temp until the defensive corefile slugcat reads are added next update (watcher being the cat and then disabling causes issues)
-            string origRet = orig.Invoke(self);
-            string[] parts = origRet.Split(new[] { "<expC>" }, StringSplitOptions.None);
-            for (int i = 0; i < parts.Length; i++)
-            {
-                if (parts[i].StartsWith("SLUG:Watcher"))
-                {
-                    parts[i] = "SLUG:White";
-                    break;
-                }
-            }
-
-            return string.Join("<expC>", parts);
+            return orig.Invoke(self);
         }
 
         public static void Save()

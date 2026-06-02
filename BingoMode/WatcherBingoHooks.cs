@@ -210,7 +210,7 @@ namespace BingoMode
             {
                 return;
             }
-            if (source.owner is Player p && p.slugcatStats.name == SlugNameMSC.Gourmand && type == Creature.DamageType.Blunt && damage > 0.25f)
+            if (source != null && source.owner is Player p && p.slugcatStats.name == SlugNameMSC.Gourmand && type == Creature.DamageType.Blunt && damage > 0.25f)
             {
                 self.LoseShell();
             }
