@@ -424,6 +424,13 @@ namespace BingoMode.BingoChallenges
                 }
             },
             {
+                ChallengeListConstants.Daemon,
+                (slug, mode, baselist) =>
+                {
+                    return baselist;
+                }
+            },
+            {
                 // The architecture of this is weird. To put it simply, everything before and including SmallCentipede from food is a food, everything before VultureGrub within the food section is a non-creature edible. Everything after SmallCentipede is an item.
                 ChallengeListConstants.BanItem,
                 (slug, mode, baselist) =>
@@ -481,7 +488,7 @@ namespace BingoMode.BingoChallenges
 
                     return baseList
                         .Where(x =>
-                            (ModManager.MSC || !mscItems.Contains(x))
+                            (ModManager.MSC || !mscItems.Contains(x) || tempSlug == watchername)
 
                             && (tempSlug == watchername || !watcherItems.Contains(x))
 

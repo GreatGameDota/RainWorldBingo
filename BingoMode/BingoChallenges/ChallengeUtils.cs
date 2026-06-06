@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -63,6 +64,7 @@ namespace BingoMode.BingoChallenges
         public const string WeaverRooms = "weaverrooms";
         public const string Creatures = "creatures";
         public const string Depths = "depths";
+        public const string Daemon = "daemon";
         public const string BanItem = "banitem";
         public const string Unlocks = "unlocks";
         public const string ChatLogs = "chatlogs";
@@ -77,6 +79,8 @@ namespace BingoMode.BingoChallenges
         public static Dictionary<string, Dictionary<string, Vector2>> BingoVistaLocations;
         public static string[] AllGates = [];
         public static string[] AllEnterableRegions = [];
+        // character - region:count
+        public static Dictionary<string, Dictionary<string, int>> RegionShelterCount; 
         public static List<string> watcherRegions;
         public static List<string> watcherSTSpots;
         public static List<string> watcherPortals;
@@ -89,6 +93,7 @@ namespace BingoMode.BingoChallenges
             On.Menu.ExpeditionMenu.ExpeditionSetup += ExpeditionMenu_ExpeditionSetup;
             FetchGatesFromFile();
             FetchAllEnterableRegions();
+            FetchShelterCount();
         }
 
         private static void ExpeditionMenu_ExpeditionSetup(On.Menu.ExpeditionMenu.orig_ExpeditionSetup orig, Menu.ExpeditionMenu self)
@@ -184,6 +189,7 @@ namespace BingoMode.BingoChallenges
                 case ChallengeListConstants.WeaverRooms: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.WeaverRooms, null, sorted);
                 case ChallengeListConstants.Creatures: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Creatures, null, sorted);
                 case ChallengeListConstants.Depths: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Depths, Depthable, sorted);
+                case ChallengeListConstants.Daemon: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Daemon, Daemonable, sorted);
                 case ChallengeListConstants.BanItem: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.BanItem, Bannable, sorted);
                 // this one fucking sucks
                 case ChallengeListConstants.Unlocks: return ChallengeUtilsFiltering.GetFilteredList(ChallengeListConstants.Unlocks, null, sorted);
@@ -286,6 +292,83 @@ namespace BingoMode.BingoChallenges
             }
         }
 
+        private static void FetchShelterCount()
+        {
+            RegionShelterCount = new Dictionary<string, Dictionary<string, int>>();
+            List<SlugName> playableChars = ExpeditionData.GetPlayableCharacters();
+            Dictionary<string, string[]> propertyCache = new();
+
+            foreach (SlugName slug in playableChars)
+            {
+                RegionShelterCount[slug.value] = new Dictionary<string, int>();
+                foreach (string regionName in AllEnterableRegions)
+                {
+                    RegionShelterCount[slug.value][regionName] = 0;
+                }
+            }
+
+            foreach(string regionName in AllEnterableRegions)
+            {
+                string[] worldFileLines = File.ReadAllLines(AssetManager.ResolveFilePath($"World{Path.DirectorySeparatorChar}{regionName}{Path.DirectorySeparatorChar}world_{regionName}.txt"));
+
+                int shelterCount = 0;
+
+                foreach (string line in worldFileLines)
+                {
+                    if (line.EndsWith(": SHELTER", StringComparison.OrdinalIgnoreCase))
+                    {
+                        shelterCount++;
+                    }
+                }
+
+                foreach (string cat in RegionShelterCount.Keys)
+                {
+                    RegionShelterCount[cat][regionName] = shelterCount;
+                }
+            }
+
+            foreach (string regionName in AllEnterableRegions)
+            {
+                foreach (string cat in RegionShelterCount.Keys)
+                {
+                    string specificCatPath = AssetManager.ResolveFilePath($"World{Path.DirectorySeparatorChar}{regionName}{Path.DirectorySeparatorChar}Properties-{cat}.txt");
+                    string defaultPath = AssetManager.ResolveFilePath($"World{Path.DirectorySeparatorChar}{regionName}{Path.DirectorySeparatorChar}Properties.txt");
+
+                    string path;
+
+                    if (File.Exists(specificCatPath)) path = specificCatPath;
+                    else if (File.Exists(defaultPath)) path = defaultPath;
+                    else path = null;
+
+                    string[] propertiesLines;
+
+                    if (path == null)
+                    {
+                        propertiesLines = Array.Empty<string>();
+                    }
+                    else if (!propertyCache.TryGetValue(path, out propertiesLines))
+                    {
+                        propertiesLines = File.ReadAllLines(path);
+                        propertyCache[path] = propertiesLines;
+                    }
+
+                    foreach (string line in propertiesLines)
+                    {
+                        string[] parts = line.Split(':');
+
+                        if (parts.Length < 3) continue;
+
+                        if (parts[0].Trim() == "Broken Shelters" && parts[1].Trim().Equals(cat, StringComparison.OrdinalIgnoreCase))
+                        {
+                            int brokenCount = parts[2].Split(',').Count(s => !string.IsNullOrWhiteSpace(s));
+
+                            RegionShelterCount[cat][regionName] -= brokenCount;
+                        }
+                    }
+                }
+            }
+        }
+
         private static void FetchGatesFromFile()
         {
             List<string> gatesToAdd = [];
@@ -326,6 +409,13 @@ namespace BingoMode.BingoChallenges
             "SmallCentipede",
             "Snail",
             "LanternMouse",
+        };
+
+        public static readonly string[] Daemonable =
+        {
+            "Hazer",
+            "VultureGrub",
+            "Tardigrade",
         };
 
         public static readonly string[] Transportable =

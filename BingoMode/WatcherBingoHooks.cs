@@ -221,7 +221,7 @@ namespace BingoMode
             {
                 c.EmitDelegate<Func<float, float>>((origRet) =>
                 {
-                    if (BingoData.BingoMode) return 0.65f;
+                    if (BingoData.BingoMode && (ExpeditionData.slugcatPlayer == SlugName.Red || ExpeditionData.slugcatPlayer == SlugNameMSC.Gourmand || ExpeditionData.slugcatPlayer == SlugNameMSC.Artificer)) return 0.65f;
                     else return origRet;
                 });
             }

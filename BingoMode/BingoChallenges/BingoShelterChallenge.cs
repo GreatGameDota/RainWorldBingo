@@ -79,13 +79,20 @@ namespace BingoMode.BingoChallenges
         {
             List<string> regiones = ChallengeUtils.GetCorrectListForChallenge(ChallengeListConstants.ShelterRegions, true).ToList();
             string regionn = regiones[UnityEngine.Random.Range(0, regiones.Count)];
+            bool u = UnityEngine.Random.value < 0.5f;
+            bool d = UnityEngine.Random.value < 0.5f;
+            int count = 0;
+            if (d || !u || regionn == "Any Region") count = UnityEngine.Random.Range(1, 8);
+            else count = UnityEngine.Random.Range(1, ChallengeUtils.RegionShelterCount[ExpeditionData.slugcatPlayer.value][regionn]);
+
+            Plugin.logger.LogInfo(ChallengeUtils.RegionShelterCount[ExpeditionData.slugcatPlayer.value][regionn]);
 
             return new BingoShelterChallenge
             {
                 region = new(regionn, "Region", 0, listName: ChallengeListConstants.ShelterRegions),
-                unique = new(UnityEngine.Random.value < 0.5f, "Unique shelters", 1),
+                unique = new(u, "Unique shelters", 1),
                 differentRegions = new(UnityEngine.Random.value < 0.5f, "Different regions", 2),
-                amount = new(1, "Amount", 3)
+                amount = new(count, "Amount", 3)
             };
         }
 
