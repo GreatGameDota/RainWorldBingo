@@ -1421,7 +1421,16 @@ namespace BingoMode
 
                 return;
             }
-        invok:
+            else
+            {
+                if (copyBoardButton.TryGetValue(self, out var copy)) {
+                    copyBoardButton.Remove(self);
+                    copy.RemoveSprites();
+                    copy.RemoveSubObject(copy);
+                    self.subObjects.Remove(copy);
+                }
+            }
+            invok:
             orig.Invoke(self);
 
             if (saveGameData != null) return;

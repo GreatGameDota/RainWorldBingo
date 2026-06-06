@@ -85,8 +85,6 @@ namespace BingoMode.BingoChallenges
             if (d || !u || regionn == "Any Region") count = UnityEngine.Random.Range(1, 8);
             else count = UnityEngine.Random.Range(1, ChallengeUtils.RegionShelterCount[ExpeditionData.slugcatPlayer.value][regionn]);
 
-            Plugin.logger.LogInfo(ChallengeUtils.RegionShelterCount[ExpeditionData.slugcatPlayer.value][regionn]);
-
             return new BingoShelterChallenge
             {
                 region = new(regionn, "Region", 0, listName: ChallengeListConstants.ShelterRegions),

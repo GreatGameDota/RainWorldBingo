@@ -181,8 +181,9 @@ namespace BingoMode
                     nameof(BingoDontUseItemChallenge),
                     nameof(BingoNoNeedleTradingChallenge),
                     nameof(BingoNoRegionChallenge),
+                    nameof(WatcherBingoNoRegionChallenge),
+                    nameof(WatcherBingoHatchMothGrubChallenge),
                 };
-                if (slug == WatcherEnums.SlugcatStatsName.Watcher) bannedChallenges[slug].Add(nameof(WatcherBingoHatchMothGrubChallenge));
             }
         }
 
