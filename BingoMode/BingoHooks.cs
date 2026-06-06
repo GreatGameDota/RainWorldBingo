@@ -33,6 +33,7 @@ namespace BingoMode
 
         public static ConditionalWeakTable<ExpeditionMenu, BingoPage> bingoPage = new();
         public static ConditionalWeakTable<CharacterSelectPage, HoldButton> newBingoButton = new();
+        public static ConditionalWeakTable<CharacterSelectPage, SimpleButton> copyBoardButton = new();
 
         public static float cantpresscounter;
 
@@ -1187,6 +1188,12 @@ namespace BingoMode
                     self.PlaySound(SoundID.MENU_Continue_Game);
                 }
             }
+            if (message == "COPYMIDGAMETOCLIPBOARD")
+            {
+                Menu.Remix.UniClipboard.SetText(BingoHooks.GlobalBoard.ToString());
+                self.PlaySound(SoundID.MENU_Next_Slugcat);
+                return;
+            }
         }
 
         public static void LoadBingoNoStart()
@@ -1404,6 +1411,14 @@ namespace BingoMode
                 self.subObjects.Add(bb);
                 self.abandonButton.Show();
                 self.abandonButton.PosX = bb.pos.x - 55f;
+
+                if (!copyBoardButton.TryGetValue(self, out _))
+                {
+                    copyBoardButton.Add(self, new SimpleButton(self.menu, self, self.menu.Translate("Copy board"), "COPYMIDGAMETOCLIPBOARD", new Vector2(745f, 78f), new Vector2(80f, 25f)));
+                }
+                copyBoardButton.TryGetValue(self, out var copy);
+                self.subObjects.Add(copy);
+
                 return;
             }
         invok:
