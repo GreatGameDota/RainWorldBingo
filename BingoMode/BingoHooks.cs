@@ -293,6 +293,23 @@ namespace BingoMode
             IL.PlayerSessionRecord.AddEat += PlayerSessionRecord_AddEat;
             // Prevent pause text from saying you'll lose the game
             IL.HUD.TextPrompt.Update += TextPrompt_Update;
+            // Fix base expedition issue with active mission not being properly checked when updating challenge previews
+            IL.Menu.CharacterSelectPage.UpdateChallengePreview += CharacterSelectPage_UpdateChallengePreviewIL;
+        }
+
+        private static void CharacterSelectPage_UpdateChallengePreviewIL(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt(typeof(Expedition.ExpeditionData).GetMethod("get_activeMission"))))
+            {
+                c.EmitDelegate<Func<string, string>>(orig =>
+                {
+                    if (ExpeditionProgression.missionList.Any((ExpeditionProgression.Mission m) => m.key == orig)) return orig;
+                    return "";
+                });
+            }
+            else Plugin.logger.LogError("BingoHooks CharacterSelectPage_UpdateChallengePreviewIL FAIULRE " + il);
         }
 
         private static void TextPrompt_Update(ILContext il)
