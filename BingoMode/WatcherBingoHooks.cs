@@ -34,6 +34,8 @@ namespace BingoMode
 
         private static Perk_DialWarp dialWarpPerkInstance;
 
+        public static Dictionary<string, string> warps = [];
+
         //private static void Template(ILContext il)
         //{
         //    ILCursor c = new ILCursor(il);
@@ -239,8 +241,140 @@ namespace BingoMode
                 // Force dynamic warps created by nonwatcher cats in watchermode to be one ways
                 On.Watcher.WarpPoint.CreateOverrideData += WarpPoint_CreateOverrideData;
             }
+            On.Room.NowViewed += On_OnNowViewed;
+            On.RainWorldGame.GoToDeathScreen += On_GoToDeathScreen;
+            On.RainWorldGame.Win += On_Win;
+            // Taken from KarmaFlowerChallenge
+            On.Player.ObjectEaten += Player_ObjectEatenKarmaFlower;
+            On.Spear.HitSomethingWithoutStopping += Spear_HitSomethingWithoutStopping;
             #region test
             #endregion
+        }
+
+        public static void On_GoToDeathScreen(On.RainWorldGame.orig_GoToDeathScreen orig, RainWorldGame self)
+        {
+            warps.Clear();
+            orig(self);
+        }
+
+        public static void On_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished, bool fromWarpPoint)
+        {
+            warps.Clear();
+            orig(self, malnourished, fromWarpPoint);
+        }
+
+        public static void Spear_HitSomethingWithoutStopping(On.Spear.orig_HitSomethingWithoutStopping orig, Spear self, PhysicalObject obj, BodyChunk chunk, PhysicalObject.Appendage appendage)
+        {
+            bool isNotReinforced = self.room.game.session is StoryGameSession && !(self.room.game.session as StoryGameSession).saveState.deathPersistentSaveData.reinforcedKarma;
+            orig.Invoke(self, obj, chunk, appendage);
+            if (obj is not KarmaFlower || !self.IsNeedle || !self.spearmasterNeedle_hasConnection) return;
+            if (isNotReinforced)
+            {
+                TrySpawnWarp(self.room, true);
+            }
+        }
+
+        public static void Player_ObjectEatenKarmaFlower(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
+        {
+            orig.Invoke(self, edible);
+            if (edible is KarmaFlower && self.room.game.session is StoryGameSession && !(self.room.game.session as StoryGameSession).saveState.deathPersistentSaveData.reinforcedKarma)
+            {
+                TrySpawnWarp(self.room, true);
+            }
+        }
+
+        public static void On_OnNowViewed(On.Room.orig_NowViewed orig, Room self)
+        {
+            orig(self);
+            TrySpawnWarp(self, false);
+        }
+
+        public static void TrySpawnWarp(Room self, bool isKarmaReinforced)
+        {
+            if (BingoData.BingoMode && ModManager.Watcher && BingoData.WatcherMode && ExpeditionData.slugcatPlayer != WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                string roomName = self.abstractRoom.name.ToUpperInvariant();
+                var w = self.roomSettings.placedObjects.Where(x => x.type == PlacedObject.Type.WarpPoint).ToList();
+                // Calling Destroy on rippleWarp doesn't remove it from this list, so this is always true for Daemon rooms shrug
+                if (w.Count != 0 && (w[0].data as WarpPoint.WarpPointData).rippleWarp)
+                {
+                    var _pos = w[0].pos;
+                    string warpType = "";
+                    bool isCreated = false;
+                    WarpPoint? currWarp = null;
+                    string oldDest = "";
+                    foreach (WarpPoint p in self.warpPoints)
+                    {
+                        var dest = p.Data.destRoom;
+                        var src = p.room.abstractRoom.name;
+                        if (!warps.TryGetValue(src + "|" + dest, out warpType))
+                        {
+                            p.Destroy();
+                        }
+                        else
+                        {
+                            isCreated = true;
+                            currWarp = p;
+                            oldDest = src + "|" + dest;
+                        }
+                    }
+
+                    if (RWCustom.Custom.rainWorld != null)
+                    {
+                        RainWorld rw = RWCustom.Custom.rainWorld;
+                        if (rw.processManager != null)
+                        {
+                            RainWorldGame? game = rw.processManager.currentMainLoop as RainWorldGame;
+                            if (game != null)
+                            {
+                                if (!isKarmaReinforced && game.session is StoryGameSession && !(game.session as StoryGameSession).saveState.deathPersistentSaveData.reinforcedKarma)
+                                {
+                                    Plugin.logger.LogInfo($"Attempting to create bad warp {isCreated} {warpType} {oldDest}");
+                                    if (!isCreated || (isCreated && warpType != "Bad"))
+                                    {
+                                        if (isCreated)
+                                        {
+                                            currWarp.Destroy();
+                                        }
+                                        var flag3 = false;
+                                        int seed = self.game.rainWorld.progression.miscProgressionData.watcherCampaignSeed + self.game.GetStorySession.saveState.miscWorldSaveData.numberOfBadWarpsGenerated;
+                                        flag3 = self.game.SeededRandom(seed) < 0.5f;
+                                        if (self.game.GetStorySession.saveState.miscWorldSaveData.numberOfRottedVanillaVisits == 0)
+                                        {
+                                            flag3 = false;
+                                        }
+                                        var text = WarpPoint.ChooseDynamicWarpTarget(self.world, self.abstractRoom.name, flag3 ? "wora" : null, true, false, true);
+                                        PlacedObject placedObject = new PlacedObject(PlacedObject.Type.WarpPoint, WarpPoint.CreateOverrideData(self.world, self.abstractRoom.name, text, null, true, true));
+                                        placedObject.data.owner = placedObject;
+                                        placedObject.pos = _pos;
+                                        var warpPoint = self.ForceSpawnWarpPoint(placedObject, true);
+                                        warps.Add(self.abstractRoom.name + "|" + text, "Bad");
+                                        Plugin.logger.LogInfo($"Created bad warp {isCreated} {warpType} {text}");
+                                    }
+                                }
+                                else
+                                {
+                                    Plugin.logger.LogInfo($"Attempting to create normal warp {isCreated} {warpType} {oldDest}");
+                                    if (!isCreated || (isCreated && warpType != "Normal"))
+                                    {
+                                        if (isCreated)
+                                        {
+                                            currWarp.Destroy();
+                                        }
+                                        var text = WarpPoint.ChooseDynamicWarpTarget(self.world, self.abstractRoom.name, null, false, false, true);
+                                        PlacedObject placedObject = new PlacedObject(PlacedObject.Type.WarpPoint, WarpPoint.CreateOverrideData(self.world, self.abstractRoom.name, text, null, true, true));
+                                        placedObject.data.owner = placedObject;
+                                        placedObject.pos = _pos;
+                                        var warpPoint = self.ForceSpawnWarpPoint(placedObject, true);
+                                        warps.Add(self.abstractRoom.name + "|" + text, "Normal");
+                                        Plugin.logger.LogInfo($"Created normal warp {isCreated} {warpType} {text}");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static WarpPoint.WarpPointData WarpPoint_CreateOverrideData(On.Watcher.WarpPoint.orig_CreateOverrideData orig, World world, string oldRoom, string chosenRoom, Vector2? chosenDestPosition, bool limitedUse, bool playerCreated)
@@ -522,7 +656,7 @@ namespace BingoMode
         private static void SpinningTop_BathScene(ILContext il)
         {
             ILCursor c = new ILCursor(il);
-            if (c.TryGotoNext(MoveType.After,i => i.MatchCall("System.String", "op_Equality")))
+            if (c.TryGotoNext(MoveType.After, i => i.MatchCall("System.String", "op_Equality")))
             {
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate<Func<bool, SpinningTop, bool>>((orig, st) =>
@@ -1029,7 +1163,7 @@ namespace BingoMode
             }
         }
 
-        
+
         private static void RainWorldGame_GoToDeathScreen(On.RainWorldGame.orig_GoToDeathScreen orig, RainWorldGame self)
         {
             if (BingoData.BingoMode && ExpeditionData.slugcatPlayer == WatcherEnums.SlugcatStatsName.Watcher)
@@ -1820,42 +1954,42 @@ namespace BingoMode
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_6_gour)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 6 - gour";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 6 - gour - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 6 - gour - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_7_gourportal)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 7 - gourportal";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 7 - gourportal - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 7 - gourportal - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_8_arti)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 8 - arti";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 8 - arti - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 8 - arti - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_9_artiportal)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 9 - artiportal";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 9 - artiportal - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 9 - artiportal - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_10_smportal)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 10 - smportal";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 10 - smportal - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 10 - smportal - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_11_rivportal)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 11 - rivportal";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 11 - rivportal - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 11 - rivportal - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_12_riveyes)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 12 - riveyes";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 12 - riveyes - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 12 - riveyes - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
             else if (self.sceneID == BingoEnums.SluhvengersScenes.sluhvengers_13_sluhvengers)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar.ToString() + "sluhvengers" + Path.DirectorySeparatorChar.ToString() + "sluhvengers 13 - sluhvengers";
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 13 - sluhvengers - flat", (new Vector2(1366f, 768f))/2, false, true));
+                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, "sluhvengers 13 - sluhvengers - flat", (new Vector2(1366f, 768f)) / 2, false, true));
             }
         }
 
@@ -1881,7 +2015,7 @@ namespace BingoMode
             }
         }
 
-        
+
 
         private static void CharacterSelectPage_UpdateSelectedSlugcat(On.Menu.CharacterSelectPage.orig_UpdateSelectedSlugcat orig, CharacterSelectPage self, int num)
         {
