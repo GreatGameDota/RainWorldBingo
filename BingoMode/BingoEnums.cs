@@ -46,18 +46,14 @@ namespace BingoMode
         public class SluhvengersScenes
         {
             public static MenuScene.SceneID sluhvengers_1_surmonk;
-            public static MenuScene.SceneID sluhvengers_2_surmonkportal;
-            public static MenuScene.SceneID sluhvengers_3_hunter;
-            public static MenuScene.SceneID sluhvengers_4_hunterportal;
-            public static MenuScene.SceneID sluhvengers_5_saintportal;
-            public static MenuScene.SceneID sluhvengers_6_gour;
-            public static MenuScene.SceneID sluhvengers_7_gourportal;
-            public static MenuScene.SceneID sluhvengers_8_arti;
-            public static MenuScene.SceneID sluhvengers_9_artiportal;
-            public static MenuScene.SceneID sluhvengers_10_smportal;
-            public static MenuScene.SceneID sluhvengers_11_rivportal;
-            public static MenuScene.SceneID sluhvengers_12_riveyes;
-            public static MenuScene.SceneID sluhvengers_13_sluhvengers;
+            public static MenuScene.SceneID sluhvengers_2_hunter;
+            public static MenuScene.SceneID sluhvengers_3_saint;
+            public static MenuScene.SceneID sluhvengers_4_gour;
+            public static MenuScene.SceneID sluhvengers_5_arti;
+            public static MenuScene.SceneID sluhvengers_6_sm;
+            public static MenuScene.SceneID sluhvengers_7_riv;
+            public static MenuScene.SceneID sluhvengers_8_eyes;
+            public static MenuScene.SceneID sluhvengers_9_sluhvengers;
 
             public static void RegisterValues()
             {
