@@ -53,6 +53,8 @@ namespace BingoMode
             // Auto restart
             On.ModManager.ModApplyer.RequiresRestart += ModApplyer_RequiresRestart;
 
+            //On.Menu.MainMenu.ExpeditionButtonPressed += MainMenu_ExpeditionButtonPressed;
+
             BingoHooks.EarlyApply();
             BingoSaveFile.Apply();
         }
@@ -68,6 +70,18 @@ namespace BingoMode
             logger = null;
         }
 
+        //private void MainMenu_ExpeditionButtonPressed(On.Menu.MainMenu.orig_ExpeditionButtonPressed orig, Menu.MainMenu self)
+        //{
+        //    ProcessManager pm = self.manager;
+        //    if (pm.musicPlayer != null)
+        //    {
+        //        pm.musicPlayer.FadeOutAllSongs(120f);
+        //    }
+        //    pm.nextSlideshow = BingoEnums.Sluhvengers;
+        //    pm.RequestMainProcessSwitch(ProcessManager.ProcessID.SlideShow);
+        //    self.PlaySound(SoundID.MENU_Switch_Page_In);
+        //}
+
         public void Update()
         {
             if (_bingoConfig == null || _bingoConfig.UseMapInput.Value) return;
@@ -75,38 +89,6 @@ namespace BingoMode
             {
                 BingoHUDMain.Toggled = !BingoHUDMain.Toggled;
             }
-            //if (Input.anyKeyDown && (Input.GetKeyDown(KeyCode.T)))
-            //{
-            //    if (RWCustom.Custom.rainWorld != null)
-            //    {
-            //        RainWorld rw = RWCustom.Custom.rainWorld;
-            //        if (rw.processManager != null)
-            //        {
-            //            ProcessManager pm = rw.processManager;
-            //            if (pm.pendingProcess == null)
-            //            {
-            //                pm.nextSlideshow = BingoEnums.Sluhvengers;
-            //                pm.RequestMainProcessSwitch(ProcessManager.ProcessID.SlideShow);
-            //            }
-            //        }
-            //    }
-            //}
-            //if (Input.anyKeyDown && (Input.GetKeyDown(KeyCode.T)))
-            //{
-            //    if (RWCustom.Custom.rainWorld != null)
-            //    {
-            //        RainWorld rw = RWCustom.Custom.rainWorld;
-            //        if (rw.processManager != null)
-            //        {
-            //            ProcessManager pm = rw.processManager;
-            //            if (pm.pendingProcess == null)
-            //            {
-            //                pm.nextSlideshow = BingoEnums.MenuTest;
-            //                pm.RequestMainProcessSwitch(ProcessManager.ProcessID.SlideShow);
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         public static void OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld raingame)

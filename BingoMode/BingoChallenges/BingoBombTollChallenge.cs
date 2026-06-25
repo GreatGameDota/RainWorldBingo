@@ -206,6 +206,9 @@ namespace BingoMode.BingoChallenges
                     {
                         if (!bombed.ContainsKey(roomUpper))
                         {
+                            bombed[roomUpper] = new bool[2];
+                            bombed[roomUpper][0] = side;
+                            bombed[roomUpper][1] = true;
                             current++;
                             UpdateDescription();
                             if (current >= amount.Value)
