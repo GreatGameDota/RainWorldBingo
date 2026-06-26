@@ -24,6 +24,7 @@ namespace BingoMode
         public readonly Configurable<bool> DiscordRichPresence;
         public readonly Configurable<bool> OneToOneSpecBoard;
         public readonly Configurable<bool> Tutorials;
+        public readonly Configurable<bool> SluhvengersSeen;
 
         public readonly Configurable<bool> DialCharged;
         public readonly Configurable<int> DialAmount;
@@ -48,6 +49,7 @@ namespace BingoMode
             DiscordRichPresence = config.Bind<bool>("DiscordRichPresence", true);
             OneToOneSpecBoard = config.Bind<bool>("OneToOneSpecBoard", false);
             Tutorials = config.Bind<bool>("Tutorials", true);
+            SluhvengersSeen = config.Bind<bool>("SluhvengersSeen", false);
 
 
             DialCharged = config.Bind<bool>("DialCharged", false);

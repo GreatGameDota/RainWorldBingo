@@ -191,6 +191,8 @@ namespace BingoMode
             On.Room.Loaded += Room_Loaded2;
             // Sluhvengers slideshow
             IL.Menu.SlideShow.ctor += SlideShow_ctor1;
+            // Play sluhvengers once on bingo entry
+            On.Menu.MainMenu.ExpeditionButtonPressed += MainMenu_ExpeditionButtonPressed;
             // Shartered terrance st always there not watcher
             On.Watcher.SpinningTopData.FromString += SpinningTopData_FromString;
             // "No" warp fatigue if not watcher
@@ -914,6 +916,26 @@ namespace BingoMode
             }
         }
 
+        private static void MainMenu_ExpeditionButtonPressed(On.Menu.MainMenu.orig_ExpeditionButtonPressed orig, Menu.MainMenu self)
+        {
+            if (!Plugin.PluginInstance.BingoConfig.SluhvengersSeen.Value || Input.GetKey(KeyCode.LeftShift))
+            {
+                ProcessManager pm = self.manager;
+                if (pm.musicPlayer != null)
+                {
+                    pm.musicPlayer.FadeOutAllSongs(60f);
+                }
+                pm.nextSlideshow = BingoEnums.Sluhvengers;
+                pm.RequestMainProcessSwitch(ProcessManager.ProcessID.SlideShow);
+                Plugin.PluginInstance.BingoConfig.SluhvengersSeen.Value = true;
+                Plugin.PluginInstance.BingoConfig._SaveConfigFile();
+            }
+            else
+            {
+                orig(self);
+            }
+        }
+
         // ConvertTime(min, sec, 10s of ms)
         // first value is start time, second is fadein done, third is fadeoutstart
         private static void SlideShow_ctor1(ILContext il)
@@ -1140,7 +1162,7 @@ namespace BingoMode
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate<Func<bool, WarpPoint, bool>>((origWarpSequenceInProgress, wp) =>
                 {
-                    if (wp?.room?.game != null)
+                    if (wp.room?.game?.FirstAlivePlayer?.Room != null)
                     {
                         // If the player is landing in a room that is not the warp point room, warp sequence in progress shouldn't matter for sealing
                         if (wp.room.abstractRoom != wp.room.game.FirstAlivePlayer.Room)
