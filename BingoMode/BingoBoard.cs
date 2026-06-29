@@ -609,7 +609,7 @@ namespace BingoMode
             }
             catch (Exception e)
             {
-                Plugin.logger.LogError("Fromstring thing broke");
+                Plugin.logger.LogError("Fromstring thing broke" + e);
             }
             if (string.IsNullOrEmpty(text) || !text.Contains(';'))
             {

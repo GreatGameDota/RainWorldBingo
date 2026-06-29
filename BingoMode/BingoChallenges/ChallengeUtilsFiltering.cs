@@ -306,7 +306,11 @@ namespace BingoMode.BingoChallenges
                 ChallengeListConstants.Craft,
                 (slug, mode, baselist) =>
                 {
-                    return baselist;
+                    List<string> mutableBase = baselist.ToList();
+                    string[] watcherModeOnly = { "FireSpriteLarva", "GraffitiBomb" /*technically not but only craftable with watcher items*/, "Tardigrade", "Rat", "SandGrub", "Frog" };
+                    if (mode != BingoModifier.WatcherMode) mutableBase = mutableBase.Where(x => !watcherModeOnly.Contains(x)).ToList();
+
+                    return mutableBase.ToArray();
                 }
             },
             {

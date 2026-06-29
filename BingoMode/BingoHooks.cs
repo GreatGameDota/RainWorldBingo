@@ -295,6 +295,21 @@ namespace BingoMode
             IL.HUD.TextPrompt.Update += TextPrompt_Update;
             // Fix base expedition issue with active mission not being properly checked when updating challenge previews
             IL.Menu.CharacterSelectPage.UpdateChallengePreview += CharacterSelectPage_UpdateChallengePreviewIL;
+            // Add plurals for certain items
+            On.Expedition.ChallengeTools.ItemName += ChallengeTools_ItemName;
+        }
+
+        private static string ChallengeTools_ItemName(On.Expedition.ChallengeTools.orig_ItemName orig, BaseAOT type)
+        {
+            if (type == DLCAOT.Seed)
+            {
+                return ChallengeTools.IGT.Translate("Seeds");
+            }
+            if (type == DLCAOT.SingularityBomb)
+            {
+                return ChallengeTools.IGT.Translate("Singularity Bombs");
+            }
+            return orig(type);
         }
 
         private static void CharacterSelectPage_UpdateChallengePreviewIL(ILContext il)

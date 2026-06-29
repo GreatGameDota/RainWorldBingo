@@ -683,7 +683,14 @@ namespace BingoMode.BingoChallenges
                     {
                         if (ExpeditionData.challengeList[j] is BingoCraftChallenge c)
                         {
-                            c.Crafted(obj.type);
+                            if (obj is AbstractCreature)
+                            {
+                                c.Crafted((obj as AbstractCreature).creatureTemplate.type.value);
+                            }
+                            else
+                            {
+                                c.Crafted(obj.type.value);
+                            }
                         }
                     }
                 });
