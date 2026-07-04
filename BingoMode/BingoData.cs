@@ -77,7 +77,8 @@ namespace BingoMode
             Bingo,
             Lockout,
             Blackout,
-            LockoutNoTies
+            LockoutNoTies,
+            Draftout,
         }
 
         public class BingoSaveData

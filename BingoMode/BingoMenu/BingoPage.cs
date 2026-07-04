@@ -528,6 +528,11 @@ namespace BingoMode.BingoMenu
 
             if (message == "LEAVE_LOBBY")
             {
+                if (grid == null)
+                {
+                    grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
+                    subObjects.Add(grid);
+                }
                 SteamTest.LeaveLobby();
                 SteamTest.GetJoinableLobbies();
                 gameControls.AllReady = true;

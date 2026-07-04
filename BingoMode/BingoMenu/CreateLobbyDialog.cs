@@ -86,11 +86,12 @@ namespace BingoMode.BingoMenu
 
             perks = new CheckBox[3];
             burdens = new CheckBox[3];
-            gamemode = new CheckBox[4];
+            gamemode = new CheckBox[5];
             string[] gamemodes = { Translate("Bingo "),
                                 Translate(" Lockout <LINE> (ties)    ").Replace("<LINE>", "\n"),
                                 Translate("  Lockout  <LINE> (no ties)  ").Replace("<LINE>", "\n"),
-                                Translate("Blackout ").Replace("<LINE>", "\n") };
+                                Translate("Blackout ").Replace("<LINE>", "\n"),
+                                Translate("[NEW] Draftout ").Replace("<LINE>", "\n") };
             string[] texts = { Translate("Allowed "), Translate("Disabled "), Translate("Host decides ") };
             for (int i = 0; i < 3; i++)
             {
@@ -105,7 +106,7 @@ namespace BingoMode.BingoMenu
                 perks[i].buttonBehav.greyedOut = inLobby && !host;
                 burdens[i].buttonBehav.greyedOut = inLobby && !host;
             }
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 gamemode[i] = new CheckBox(this, pages[0], this, outOfBounds, 0f, gamemodes[i], "GAMJ" + i.ToString());
                 gamemode[i].label.label.alignment = FLabelAlignment.Right;
@@ -215,17 +216,17 @@ namespace BingoMode.BingoMenu
                 }
             }
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
-                gamemode[i].pos = new Vector2(xPos - 188f + 140f * i, yTop - 100f);
-                if (gamemode[i].displayText == BingoText)
-                {
-                    gamemode[i].pos.x += 17f;
-                }
-                else if (gamemode[i].displayText == BlackoutText)
-                {
-                    gamemode[i].pos.x -= 44f;
-                }
+                gamemode[i].pos = new Vector2(xPos - 265f + 140f * i, yTop - 100f);
+                // if (gamemode[i].displayText == BingoText)
+                // {
+                //     gamemode[i].pos.x += 17f;
+                // }
+                // else if (gamemode[i].displayText == BlackoutText)
+                // {
+                //     gamemode[i].pos.x -= 44f;
+                // }
             }
 
 
@@ -309,6 +310,8 @@ namespace BingoMode.BingoMenu
                         return BingoData.globalSettings.gamemode == BingoData.BingoGameMode.LockoutNoTies;
                     case 3:
                         return BingoData.globalSettings.gamemode == BingoData.BingoGameMode.Blackout;
+                    case 4:
+                        return BingoData.globalSettings.gamemode == BingoData.BingoGameMode.Draftout;
                 }
                 return false;
             }
@@ -373,6 +376,9 @@ namespace BingoMode.BingoMenu
                         break;
                     case 3:
                         BingoData.globalSettings.gamemode = BingoData.BingoGameMode.Blackout;
+                        break;
+                    case 4:
+                        BingoData.globalSettings.gamemode = BingoData.BingoGameMode.Draftout;
                         break;
                 }
             }

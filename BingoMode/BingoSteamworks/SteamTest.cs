@@ -382,6 +382,12 @@ namespace BingoMode.BingoSteamworks
 
             if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
             {
+                if (BingoData.globalSettings.gamemode == BingoData.BingoGameMode.Draftout && page.grid != null)
+                {
+                    page.grid.RemoveSprites();
+                    page.RemoveSubObject(page.grid);
+                    page.grid = null;
+                }
                 page.Switch(true, true);
             }
         }
@@ -442,6 +448,12 @@ namespace BingoMode.BingoSteamworks
 
             if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
             {
+                if (BingoData.globalSettings.gamemode == BingoData.BingoGameMode.Draftout && page.grid != null)
+                {
+                    page.grid.RemoveSprites();
+                    page.RemoveSubObject(page.grid);
+                    page.grid = null;
+                }
                 page.Switch(true, false);
             }
         }
