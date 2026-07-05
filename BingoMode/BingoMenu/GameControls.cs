@@ -42,7 +42,7 @@ namespace BingoMode.BingoMenu
         private const float COPY_PASTE_WDITH = 80f;
         private const float COPY_PASTE_HEIGHT = 20f;
 
-        private MenuTabWrapper tabWrapper;
+        internal MenuTabWrapper tabWrapper;
         private MenuLabel nallReady;
         private HoldButton startGame;
         private MenuLabel shelterLabel;
@@ -54,6 +54,8 @@ namespace BingoMode.BingoMenu
         private SymbolButton plusButton;
         private SimpleButton copyBoard;
         private SimpleButton pasteBoard;
+        internal OpHoldButton draftoutButton;
+        internal UIelementWrapper draftoutWrapper;
 
         public bool HostPrivilege
         {
@@ -64,6 +66,7 @@ namespace BingoMode.BingoMenu
                 minusButton.buttonBehav.greyedOut = !value;
                 pasteBoard.buttonBehav.greyedOut = !value;
                 copyBoard.buttonBehav.greyedOut = !value;
+                draftoutButton.greyedOut = !value;
                 startGame.signalText = value ? "STARTBINGO" : "GETREADY";
                 startGame.menuLabel.text = value ? menu.Translate("BEGIN") : menu.Translate("I'M<LINE>READY").Replace("<LINE>", "\r\n");
             }
@@ -184,6 +187,14 @@ namespace BingoMode.BingoMenu
                     pos + new Vector2((WIDTH + MARGIN) / 2f, COPY_PASTE_Y),
                     new Vector2(COPY_PASTE_WDITH, COPY_PASTE_HEIGHT));
             subObjects.Add(pasteBoard);
+
+            draftoutButton = new(
+                    pos + new Vector2(RESIZE_BUTTON_SIZE + MARGIN, 300f),
+                    new Vector2(UNLOCKS_BUTTON_WIDTH, UNLOCKS_BUTTON_HEIGHT),
+                    menu.Translate("Start Draftout"),
+                    20f)
+            { description = " " };
+            draftoutButton.OnPressDone += DraftoutButton_OnPressDone;
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -265,6 +276,9 @@ namespace BingoMode.BingoMenu
             tabWrapper.wrappers.Remove(shelterSetting);
             tabWrapper.subObjects.Remove(unlockWrapper);
             tabWrapper.subObjects.Remove(shelterSettingWrapper);
+            draftoutButton.Unload();
+            tabWrapper.wrappers.Remove(draftoutButton);
+            tabWrapper.subObjects.Remove(draftoutWrapper);
             foreach (MenuObject obj in subObjects)
             {
                 obj.RemoveSprites();
@@ -315,6 +329,16 @@ namespace BingoMode.BingoMenu
         {
             unlocksButton.greyedOut = false;
             unlocksButton.Reset();
+        }
+
+        private void DraftoutButton_OnPressDone(UIfocusable trigger)
+        {
+            draftoutButton.greyedOut = true;
+            // draftoutButton.Reset();
+            if (BingoData.MultiplayerGame)
+            {
+                bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
+            }
         }
 
         private void ShelterSetting_OnValueUpdate(UIconfig config, string value, string oldValue) =>

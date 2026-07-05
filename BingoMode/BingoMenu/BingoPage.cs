@@ -44,7 +44,7 @@ namespace BingoMode.BingoMenu
         public BingoBoard board;
         public BingoGrid grid;
         public BoardControls boardControls;
-        private GameControls gameControls;
+        internal GameControls gameControls;
         public string Shelter
         {
             get => gameControls.Shelter; set => gameControls.Shelter = value;
@@ -207,7 +207,7 @@ namespace BingoMode.BingoMenu
         {
             gameControls.HostPrivilege = isHost;
             boardControls.HostPrivilege = isHost;
-            grid.Switch(!isHost);
+            grid?.Switch(!isHost);
 
             multiplayerPanel.UpdateLobbyHost(isHost);
         }
@@ -235,7 +235,7 @@ namespace BingoMode.BingoMenu
                 expMenu.manualButton.buttonBehav.greyedOut = true;
                 multiplayerButton.menuLabel.text = expMenu.Translate("Leave Lobby");
                 multiplayerButton.signalText = "LEAVE_LOBBY";
-                grid.Switch(!create);
+                grid?.Switch(!create);
                 return;
             }
 
@@ -532,6 +532,16 @@ namespace BingoMode.BingoMenu
                 {
                     grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
                     subObjects.Add(grid);
+
+                    // gameControls.tabWrapper.wrappers.Remove(gameControls.draftoutButton);
+                    // gameControls.tabWrapper.subObjects.Remove(gameControls.draftoutWrapper);
+                    // gameControls.RemoveSubObject(gameControls.draftoutWrapper);
+
+                    gameControls.RemoveSprites();
+                    RecursiveRemoveSelectables(gameControls);
+                    subObjects.Remove(gameControls);
+                    gameControls = new(menu, this, new Vector2(menu.manager.rainWorld.screenSize.x * 0.79f - 45f, 60f));
+                    subObjects.Add(gameControls);
                 }
                 SteamTest.LeaveLobby();
                 SteamTest.GetJoinableLobbies();

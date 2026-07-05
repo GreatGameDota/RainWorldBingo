@@ -1,6 +1,7 @@
 ﻿using Expedition;
 using RWCustom;
 using Steamworks;
+using Menu.Remix;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -387,6 +388,9 @@ namespace BingoMode.BingoSteamworks
                     page.grid.RemoveSprites();
                     page.RemoveSubObject(page.grid);
                     page.grid = null;
+
+                    page.gameControls.draftoutWrapper = new UIelementWrapper(page.gameControls.tabWrapper, page.gameControls.draftoutButton);
+                    page.gameControls.subObjects.Add(page.gameControls.draftoutWrapper);
                 }
                 page.Switch(true, true);
             }
@@ -453,6 +457,9 @@ namespace BingoMode.BingoSteamworks
                     page.grid.RemoveSprites();
                     page.RemoveSubObject(page.grid);
                     page.grid = null;
+
+                    page.gameControls.draftoutWrapper = new UIelementWrapper(page.gameControls.tabWrapper, page.gameControls.draftoutButton);
+                    page.gameControls.subObjects.Add(page.gameControls.draftoutWrapper);
                 }
                 page.Switch(true, false);
             }
