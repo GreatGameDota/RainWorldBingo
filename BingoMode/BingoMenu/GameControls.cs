@@ -338,6 +338,13 @@ namespace BingoMode.BingoMenu
             if (BingoData.MultiplayerGame)
             {
                 bool isHost = SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == SteamTest.selfIdentity.GetSteamID();
+                if (isHost)
+                {
+                    if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page))
+                    {
+                        page.Singal(this, "DRAFTOUT");
+                    }
+                }
             }
         }
 

@@ -36,6 +36,12 @@ namespace BingoMode.BingoMenu
 
         private MenuLabel nowPlaying;
         private MenuLabel tutorial;
+        internal MenuLabel timer;
+        float time = 0;
+        float time2 = 0;
+        int draftoutStage = 0;
+        internal BingoButton goal1;
+        internal BingoButton goal2;
 
         private FSprite title;
         private SymbolButton back;
@@ -132,6 +138,10 @@ namespace BingoMode.BingoMenu
             nowPlaying.label.color = new Color(0.5f, 0.5f, 0.5f);
             nowPlaying.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
             subObjects.Add(nowPlaying);
+
+            timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 500f), default, true, null);
+            timer.label.color = new Color(0.85f, 0.85f, 0.85f);
+            timer.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
 
             tutorial = new MenuLabel(menu, owner, Plugin.PluginInstance.BingoConfig.Tutorials.Value ? menu.Translate("Click a square to customize it!") : "", topCenter - new Vector2(0, 100f), default(Vector2), true, null);
             tutorial.label.color = new Color(0.85f, 0.85f, 0.85f);
@@ -329,6 +339,86 @@ namespace BingoMode.BingoMenu
 
             nowPlaying.text = expMenu.characterSelect.nowPlaying.label.text;
 
+            if (timer != null && time > 0)
+            {
+                time -= timeStacker / 40;
+                if (time < 0)
+                {
+                    time = 0;
+                    time2 = 1; // buffer time
+
+                    if (goal1 != null)
+                    {
+                        goal1.RemoveSprites();
+                        RecursiveRemoveSelectables(goal1);
+                        subObjects.Remove(goal2);
+                    }
+                    if (goal2 != null)
+                    {
+                        goal2.RemoveSprites();
+                        RecursiveRemoveSelectables(goal2);
+                        subObjects.Remove(goal1);
+                    }
+                }
+                timer.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss\:fff");
+            }
+            else if (timer != null && time2 > 0)
+            {
+                time2 -= timeStacker / 40;
+                if (time2 < 0)
+                {
+                    time2 = 0;
+                    draftoutStage++;
+                    if (draftoutStage % 2 == 1)
+                    {
+                        int i = 0, j = 0;
+                        float butSize = 250;
+                        float topLeft = -butSize * 2 / 2f;
+                        Vector2 centerPos = new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f);
+
+                        ExpeditionData.ClearActiveChallengeList();
+
+                        goal1 = new(
+                            menu,
+                            this,
+                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j);
+                        goal1.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
+                        goal1.buttonBehav.greyedOut = true;
+                        i++;
+
+                        goal2 = new(
+                            menu,
+                            this,
+                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j);
+                        goal2.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
+                        goal2.buttonBehav.greyedOut = true;
+
+                        foreach (Challenge c in ExpeditionData.challengeList)
+                            c.UpdateDescription();
+
+                        subObjects.Add(goal1);
+                        subObjects.Add(goal2);
+                    }
+                    // use GlobalBoard.RecreateFromList ?
+                    time = draftoutStage switch
+                    {
+                        1 => 5,
+                        2 => 5,
+                        3 => 5,
+                        _ => 5,
+                    };
+                }
+                timer.text = TimeSpan.FromSeconds(time2).ToString(@"mm\:ss\:fff");
+            }
+
             if (title.element == watcherTitle && BingoData.slugcatPlayer != SlugNameWatcher.Watcher)
             {
                 title.element = normalTitle;
@@ -431,7 +521,7 @@ namespace BingoMode.BingoMenu
                     {
                         foreach (var banned in bannedRegions)
                         {
-                            
+
                             if (bannedRegions.Count == ChallengeUtils.GetCorrectListForChallenge(ChallengeListConstants.RegionsReal, true).Length)
                             {
                                 BingoData.BingoDen = "SU_S01";
@@ -532,6 +622,7 @@ namespace BingoMode.BingoMenu
                 {
                     grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
                     subObjects.Add(grid);
+                    BingoHooks.GlobalBoard.GenerateBoard(5);
 
                     // gameControls.tabWrapper.wrappers.Remove(gameControls.draftoutButton);
                     // gameControls.tabWrapper.subObjects.Remove(gameControls.draftoutWrapper);
@@ -542,6 +633,26 @@ namespace BingoMode.BingoMenu
                     subObjects.Remove(gameControls);
                     gameControls = new(menu, this, new Vector2(menu.manager.rainWorld.screenSize.x * 0.79f - 45f, 60f));
                     subObjects.Add(gameControls);
+
+                    if (timer != null)
+                    {
+                        timer.RemoveSprites();
+                        RecursiveRemoveSelectables(timer);
+                        subObjects.Remove(timer);
+                        timer = null;
+                    }
+                    if (goal1 != null)
+                    {
+                        goal1.RemoveSprites();
+                        RecursiveRemoveSelectables(goal1);
+                        subObjects.Remove(goal2);
+                    }
+                    if (goal2 != null)
+                    {
+                        goal2.RemoveSprites();
+                        RecursiveRemoveSelectables(goal2);
+                        subObjects.Remove(goal1);
+                    }
                 }
                 SteamTest.LeaveLobby();
                 SteamTest.GetJoinableLobbies();
@@ -593,6 +704,21 @@ namespace BingoMode.BingoMenu
                 if (randomizerSlideStep == 0f) randomizerSlideStep = 1f;
                 else randomizerSlideStep = -randomizerSlideStep;
                 float ff = randomizerSlideStep == 1f ? 1f : 0f;
+                return;
+            }
+
+            if (message == "DRAFTOUT")
+            {
+                time = 5;
+                draftoutStage = 0;
+                if (timer == null)
+                {
+                    Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
+                    timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 500f), default, true, null);
+                    timer.label.color = new Color(0.85f, 0.85f, 0.85f);
+                    timer.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
+                }
+                subObjects.Add(timer);
                 return;
             }
 
@@ -697,6 +823,6 @@ namespace BingoMode.BingoMenu
             else Plugin.logger.LogError("expMenu not real whoopsie daisies");
 
         }
-        
+
     }
 }
