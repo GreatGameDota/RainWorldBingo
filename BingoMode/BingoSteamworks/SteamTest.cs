@@ -592,9 +592,17 @@ namespace BingoMode.BingoSteamworks
                 //     LeaveLobby();
                 //     return;
                 // }
-                SteamNetworkingIdentity hostIdentity = new SteamNetworkingIdentity();
-                hostIdentity.SetSteamID(SteamMatchmaking.GetLobbyOwner(CurrentLobby));
-                InnerWorkings.SendMessage($"O{selfIdentity.GetSteamID64()}", hostIdentity);
+
+                string draftoutStage = SteamMatchmaking.GetLobbyData(CurrentLobby, "draftoutStage");
+                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2))
+                {
+                    int newStage = int.Parse(draftoutStage);
+                    if (page2.draftoutStage == 0 && newStage != 0)
+                    {
+                        page2.Singal(null, "DRAFTOUT");
+                    }
+                    page2.draftoutStage = newStage;
+                }
 
                 FetchLobbySettings();
             }

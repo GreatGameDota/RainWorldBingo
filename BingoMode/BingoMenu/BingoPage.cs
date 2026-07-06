@@ -39,7 +39,7 @@ namespace BingoMode.BingoMenu
         internal MenuLabel timer;
         float time = 0;
         float time2 = 0;
-        int draftoutStage = 0;
+        internal int draftoutStage = 0;
         internal BingoButton goal1;
         internal BingoButton goal2;
         internal List<Challenge> draftoutChallenges = [];
@@ -143,7 +143,7 @@ namespace BingoMode.BingoMenu
             nowPlaying.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
             subObjects.Add(nowPlaying);
 
-            timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 400f), default, true, null);
+            timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 450f), default, true, null);
             timer.label.color = new Color(0.85f, 0.85f, 0.85f);
             timer.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
 
@@ -343,159 +343,10 @@ namespace BingoMode.BingoMenu
 
             nowPlaying.text = expMenu.characterSelect.nowPlaying.label.text;
 
-            if (timer != null && time > 0)
+            if (InLobby)
             {
-                time -= timeStacker / 40;
-                if (time < 0)
-                {
-                    time = 0;
-                    time2 = 1; // buffer time
-
-                    if (goal1 != null)
-                    {
-                        goal1.RemoveSprites();
-                        RecursiveRemoveSelectables(goal1);
-                        subObjects.Remove(goal2);
-                    }
-                    if (goal2 != null)
-                    {
-                        goal2.RemoveSprites();
-                        RecursiveRemoveSelectables(goal2);
-                        subObjects.Remove(goal1);
-                    }
-                }
-                timer.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss\:fff");
-            }
-            else if (timer != null && time2 > 0)
-            {
-                time2 -= timeStacker / 40;
-                if (time2 < 0)
-                {
-                    time2 = 0;
-                    draftoutStage++;
-                    if (draftoutStage % 2 == 1)
-                    {
-                        int i = 0, j = 0;
-                        float butSize = 250;
-                        float topLeft = -butSize * 2 / 2f;
-                        Vector2 centerPos = new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f);
-
-                        ExpeditionData.ClearActiveChallengeList();
-                        foreach (Challenge ch in draftoutChallenges)
-                        {
-                            if (!ExpeditionData.challengeList.Contains(ch))
-                            {
-                                ExpeditionData.challengeList.Add(ch);
-                            }
-                        }
-
-                        goal1 = new(
-                            menu,
-                            this,
-                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
-                            new Vector2(butSize, butSize),
-                            i + " " + j,
-                            i,
-                            j);
-                        goal1.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
-                        // goal1.buttonBehav.greyedOut = true;
-                        i++;
-
-                        goal2 = new(
-                            menu,
-                            this,
-                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
-                            new Vector2(butSize, butSize),
-                            i + " " + j,
-                            i,
-                            j);
-                        goal2.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
-                        // goal2.buttonBehav.greyedOut = true;
-
-                        foreach (Challenge c in ExpeditionData.challengeList)
-                            c.UpdateDescription();
-
-                        subObjects.Add(goal1);
-                        subObjects.Add(goal2);
-                    }
-                    else
-                    {
-                        if (selectedChallenge != null)
-                        {
-                            draftoutChallenges.Add(selectedChallenge);
-                            selectedChallenge = null;
-                        }
-                        else if (goal1 != null && goal2 != null)
-                        {
-                            draftoutChallenges.Add(UnityEngine.Random.value < 0.5f ? goal1.challenge : goal2.challenge);
-                        }
-
-                        int i = boardPreview.Count % BingoHooks.GlobalBoard.size;
-                        int j = boardPreview.Count / BingoHooks.GlobalBoard.size;
-                        float butSize = 500f / 9;
-                        float topLeft = -butSize * 9 / 2f;
-                        Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
-
-                        boardPreview.Add(new(
-                            menu,
-                            this,
-                            topCenter - new Vector2(0, 700f) + new Vector2(topLeft + i * butSize + butSize / 2f + (175f - BingoHooks.GlobalBoard.size / 2f * butSize / 2f), -topLeft - j * butSize - butSize / 2f),
-                            new Vector2(butSize, butSize),
-                            i + " " + j,
-                            i,
-                            j)
-                        {
-                            challenge = draftoutChallenges.Last(),
-                        });
-                        boardPreview.Last().challenge.UpdateDescription();
-                        boardPreview.Last().buttonBehav.greyedOut = true;
-                        subObjects.Add(boardPreview.Last());
-                    }
-
-                    if (draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2)
-                    {
-                        BingoHooks.GlobalBoard.recreateList = draftoutChallenges;
-                        BingoHooks.GlobalBoard.RecreateFromList();
-                        grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
-                        subObjects.Add(grid);
-                        gameControls.draftoutButton.greyedOut = false;
-                        draftoutChallenges.Clear();
-                        if (timer != null)
-                        {
-                            timer.RemoveSprites();
-                            RecursiveRemoveSelectables(timer);
-                            subObjects.Remove(timer);
-                            timer = null;
-                        }
-                        if (goal1 != null)
-                        {
-                            goal1.RemoveSprites();
-                            RecursiveRemoveSelectables(goal1);
-                            subObjects.Remove(goal1);
-                        }
-                        if (goal2 != null)
-                        {
-                            goal2.RemoveSprites();
-                            RecursiveRemoveSelectables(goal2);
-                            subObjects.Remove(goal2);
-                        }
-                        foreach (BingoButton but in boardPreview)
-                        {
-                            but.RemoveSprites();
-                            RecursiveRemoveSelectables(but);
-                            subObjects.Remove(but);
-                        }
-                        boardPreview.Clear();
-                    }
-                    else
-                    {
-                        time = draftoutStage % 2 == 1 ? 5 : 1;
-                    }
-                }
-                if (timer != null)
-                {
-                    timer.text = TimeSpan.FromSeconds(time2).ToString(@"mm\:ss\:fff");
-                }
+                ulong _id = SteamTest.selfIdentity.GetSteamID64();
+                RenderDraftoutUI(timeStacker, SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby) == (CSteamID)_id);
             }
 
             if (title.element == watcherTitle && BingoData.slugcatPlayer != SlugNameWatcher.Watcher)
@@ -803,7 +654,7 @@ namespace BingoMode.BingoMenu
                 if (timer == null)
                 {
                     Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
-                    timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 400f), default, true, null);
+                    timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 450f), default, true, null);
                     timer.label.color = new Color(0.85f, 0.85f, 0.85f);
                     timer.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
                     if (grid != null)
@@ -919,5 +770,317 @@ namespace BingoMode.BingoMenu
 
         }
 
+        private void RenderDraftoutUI(float timeStacker, bool isHost)
+        {
+            if (!isHost)
+            {
+                time = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime"));
+                time2 = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime2"));
+                int oldStage = draftoutStage;
+                draftoutStage = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutStage"));
+                if (oldStage < draftoutStage)
+                {
+                    if (draftoutStage % 2 == 1)
+                    {
+                        string[] array11 = Regex.Split(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutGoal1"), "~");
+                        string type = array11[0];
+                        string text2 = array11[1];
+                        Challenge _goal1 = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
+                        _goal1.FromString(text2);
+
+                        array11 = Regex.Split(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutGoal2"), "~");
+                        type = array11[0];
+                        text2 = array11[1];
+                        Challenge _goal2 = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
+                        _goal2.FromString(text2);
+
+                        int i = 0, j = 0;
+                        float butSize = 250;
+                        float topLeft = -butSize * 2 / 2f;
+                        Vector2 centerPos = new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f);
+
+                        goal1 = new(
+                            menu,
+                            this,
+                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j);
+                        goal1.challenge = _goal1;
+                        i++;
+
+                        goal2 = new(
+                            menu,
+                            this,
+                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j);
+                        goal2.challenge = _goal2;
+
+                        subObjects.Add(goal1);
+                        subObjects.Add(goal2);
+                    }
+                    else
+                    {
+                        // Check if on picking team and update lobby settings? but only 1 person does that?
+                        // if (selectedChallenge != null)
+                        // {
+                        //     draftoutChallenges.Add(selectedChallenge);
+                        //     selectedChallenge = null;
+                        // }
+                        // else if (goal1 != null && goal2 != null)
+                        // {
+                        //     draftoutChallenges.Add(UnityEngine.Random.value < 0.5f ? goal1.challenge : goal2.challenge);
+                        // }
+
+                        string[] array11 = Regex.Split(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutSelectedGoal"), "~");
+                        string type = array11[0];
+                        string text2 = array11[1];
+                        Challenge _goal1 = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
+                        _goal1.FromString(text2);
+
+                        int i = boardPreview.Count % BingoHooks.GlobalBoard.size;
+                        int j = boardPreview.Count / BingoHooks.GlobalBoard.size;
+                        float butSize = 500f / 9;
+                        float topLeft = -butSize * 9 / 2f;
+                        Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
+
+                        boardPreview.Add(new(
+                            menu,
+                            this,
+                            topCenter - new Vector2(0, 750f) + new Vector2(topLeft + i * butSize + butSize / 2f + (175f - BingoHooks.GlobalBoard.size / 2f * butSize / 2f), -topLeft - j * butSize - butSize / 2f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j)
+                        {
+                            challenge = _goal1,
+                        });
+                        boardPreview.Last().challenge.UpdateDescription();
+                        boardPreview.Last().buttonBehav.greyedOut = true;
+                        subObjects.Add(boardPreview.Last());
+                        // If someone leaves mid draft, loses all of preview, but not gonna send the entire board for just a preview
+                    }
+                    
+                    if (draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2)
+                    {
+                        grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
+                        subObjects.Add(grid);
+                        // gameControls.draftoutButton.greyedOut = false;
+                        draftoutChallenges.Clear();
+                        if (timer != null)
+                        {
+                            timer.RemoveSprites();
+                            RecursiveRemoveSelectables(timer);
+                            subObjects.Remove(timer);
+                            timer = null;
+                        }
+                        if (goal1 != null)
+                        {
+                            goal1.RemoveSprites();
+                            RecursiveRemoveSelectables(goal1);
+                            subObjects.Remove(goal1);
+                        }
+                        if (goal2 != null)
+                        {
+                            goal2.RemoveSprites();
+                            RecursiveRemoveSelectables(goal2);
+                            subObjects.Remove(goal2);
+                        }
+                        foreach (BingoButton but in boardPreview)
+                        {
+                            but.RemoveSprites();
+                            RecursiveRemoveSelectables(but);
+                            subObjects.Remove(but);
+                        }
+                        boardPreview.Clear();
+                        draftoutStage = 0;
+                    }
+                }
+            }
+
+            if (timer != null && time > 0)
+            {
+                if (isHost)
+                {
+                    time -= timeStacker / 40;
+                }
+                if (time < 0)
+                {
+                    time = 0;
+                    time2 = 1; // buffer time
+                }
+                if (isHost)
+                {
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime", time.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime2", time2.ToString());
+                }
+                timer.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss\:fff");
+            }
+            else if (timer != null && time2 > 0)
+            {
+                if (goal1 != null)
+                {
+                    goal1.RemoveSprites();
+                    RecursiveRemoveSelectables(goal1);
+                    subObjects.Remove(goal1);
+                }
+                if (goal2 != null)
+                {
+                    goal2.RemoveSprites();
+                    RecursiveRemoveSelectables(goal2);
+                    subObjects.Remove(goal2);
+                }
+
+                if (isHost)
+                {
+                    time2 -= timeStacker / 40;
+                }
+                if (time2 < 0)
+                {
+                    time2 = 0;
+                    if (isHost) // this prob not needed
+                    {
+                        draftoutStage++;
+                    }
+                    if (draftoutStage % 2 == 1)
+                    {
+                        int i = 0, j = 0;
+                        float butSize = 250;
+                        float topLeft = -butSize * 2 / 2f;
+                        Vector2 centerPos = new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f);
+
+                        ExpeditionData.ClearActiveChallengeList();
+                        foreach (Challenge ch in draftoutChallenges)
+                        {
+                            if (!ExpeditionData.challengeList.Contains(ch))
+                            {
+                                ExpeditionData.challengeList.Add(ch);
+                            }
+                        }
+
+                        goal1 = new(
+                            menu,
+                            this,
+                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j);
+                        goal1.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
+                        i++;
+
+                        goal2 = new(
+                            menu,
+                            this,
+                            centerPos - new Vector2(butSize / 2f, butSize / 2f) + new Vector2(topLeft + i * butSize + butSize / 2f, -topLeft - j * butSize - butSize / 2f - 50f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j);
+                        goal2.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
+
+                        foreach (Challenge c in ExpeditionData.challengeList)
+                            c.UpdateDescription();
+
+                        subObjects.Add(goal1);
+                        subObjects.Add(goal2);
+                    }
+                    else
+                    {
+                        if (selectedChallenge != null)
+                        {
+                            draftoutChallenges.Add(selectedChallenge);
+                            selectedChallenge = null;
+                        }
+                        else if (goal1 != null && goal2 != null)
+                        {
+                            draftoutChallenges.Add(UnityEngine.Random.value < 0.5f ? goal1.challenge : goal2.challenge);
+                        }
+
+                        int i = boardPreview.Count % BingoHooks.GlobalBoard.size;
+                        int j = boardPreview.Count / BingoHooks.GlobalBoard.size;
+                        float butSize = 500f / 9;
+                        float topLeft = -butSize * 9 / 2f;
+                        Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
+
+                        boardPreview.Add(new(
+                            menu,
+                            this,
+                            topCenter - new Vector2(0, 750f) + new Vector2(topLeft + i * butSize + butSize / 2f + (175f - BingoHooks.GlobalBoard.size / 2f * butSize / 2f), -topLeft - j * butSize - butSize / 2f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j)
+                        {
+                            challenge = draftoutChallenges.Last(),
+                        });
+                        boardPreview.Last().challenge.UpdateDescription();
+                        boardPreview.Last().buttonBehav.greyedOut = true;
+                        subObjects.Add(boardPreview.Last());
+                    }
+
+                    if (draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2)
+                    {
+                        BingoHooks.GlobalBoard.recreateList = draftoutChallenges;
+                        BingoHooks.GlobalBoard.RecreateFromList();
+                        SteamTest.UpdateOnlineBingo();
+
+                        grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
+                        subObjects.Add(grid);
+                        gameControls.draftoutButton.greyedOut = false;
+                        draftoutChallenges.Clear();
+                        if (timer != null)
+                        {
+                            timer.RemoveSprites();
+                            RecursiveRemoveSelectables(timer);
+                            subObjects.Remove(timer);
+                            timer = null;
+                        }
+                        if (goal1 != null)
+                        {
+                            goal1.RemoveSprites();
+                            RecursiveRemoveSelectables(goal1);
+                            subObjects.Remove(goal1);
+                        }
+                        if (goal2 != null)
+                        {
+                            goal2.RemoveSprites();
+                            RecursiveRemoveSelectables(goal2);
+                            subObjects.Remove(goal2);
+                        }
+                        foreach (BingoButton but in boardPreview)
+                        {
+                            but.RemoveSprites();
+                            RecursiveRemoveSelectables(but);
+                            subObjects.Remove(but);
+                        }
+                        boardPreview.Clear();
+                        draftoutStage = 0;
+                    }
+                    else
+                    {
+                        time = draftoutStage % 2 == 1 ? 5 : 1;
+                    }
+                }
+                if (isHost)
+                {
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime", time.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime2", time2.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal1", goal1?.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal2", goal2?.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutBoardPreviewLength", boardPreview.Count.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutSelectedGoal", boardPreview.LastOrDefault()?.ToString());
+                }
+                if (timer != null)
+                {
+                    timer.text = TimeSpan.FromSeconds(time2).ToString(@"mm\:ss\:fff");
+                }
+            }
+        }
     }
 }
