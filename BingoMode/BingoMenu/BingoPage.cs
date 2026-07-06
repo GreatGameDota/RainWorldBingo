@@ -773,7 +773,7 @@ namespace BingoMode.BingoMenu
 
         private void RenderDraftoutUI(float timeStacker, bool isHost)
         {
-            if (!isHost)
+            if (timer != null && (time > 0 || time2 > 0) && !isHost)
             {
                 time = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime"));
                 time2 = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime2"));
