@@ -42,6 +42,10 @@ namespace BingoMode.BingoMenu
         int draftoutStage = 0;
         internal BingoButton goal1;
         internal BingoButton goal2;
+        internal List<Challenge> draftoutChallenges = [];
+        public bool isDraftout => draftoutStage > 0 && draftoutStage < BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2;
+        public Challenge selectedChallenge;
+        public List<BingoButton> boardPreview = [];
 
         private FSprite title;
         private SymbolButton back;
@@ -139,7 +143,7 @@ namespace BingoMode.BingoMenu
             nowPlaying.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
             subObjects.Add(nowPlaying);
 
-            timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 500f), default, true, null);
+            timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 400f), default, true, null);
             timer.label.color = new Color(0.85f, 0.85f, 0.85f);
             timer.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
 
@@ -377,6 +381,13 @@ namespace BingoMode.BingoMenu
                         Vector2 centerPos = new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f);
 
                         ExpeditionData.ClearActiveChallengeList();
+                        foreach (Challenge ch in draftoutChallenges)
+                        {
+                            if (!ExpeditionData.challengeList.Contains(ch))
+                            {
+                                ExpeditionData.challengeList.Add(ch);
+                            }
+                        }
 
                         goal1 = new(
                             menu,
@@ -387,7 +398,7 @@ namespace BingoMode.BingoMenu
                             i,
                             j);
                         goal1.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
-                        goal1.buttonBehav.greyedOut = true;
+                        // goal1.buttonBehav.greyedOut = true;
                         i++;
 
                         goal2 = new(
@@ -399,7 +410,7 @@ namespace BingoMode.BingoMenu
                             i,
                             j);
                         goal2.challenge = BingoHooks.GlobalBoard.RandomBingoChallenge(x: i, y: j);
-                        goal2.buttonBehav.greyedOut = true;
+                        // goal2.buttonBehav.greyedOut = true;
 
                         foreach (Challenge c in ExpeditionData.challengeList)
                             c.UpdateDescription();
@@ -407,16 +418,84 @@ namespace BingoMode.BingoMenu
                         subObjects.Add(goal1);
                         subObjects.Add(goal2);
                     }
-                    // use GlobalBoard.RecreateFromList ?
-                    time = draftoutStage switch
+                    else
                     {
-                        1 => 5,
-                        2 => 5,
-                        3 => 5,
-                        _ => 5,
-                    };
+                        if (selectedChallenge != null)
+                        {
+                            draftoutChallenges.Add(selectedChallenge);
+                            selectedChallenge = null;
+                        }
+                        else if (goal1 != null && goal2 != null)
+                        {
+                            draftoutChallenges.Add(UnityEngine.Random.value < 0.5f ? goal1.challenge : goal2.challenge);
+                        }
+
+                        int i = boardPreview.Count % BingoHooks.GlobalBoard.size;
+                        int j = boardPreview.Count / BingoHooks.GlobalBoard.size;
+                        float butSize = 500f / 9;
+                        float topLeft = -butSize * 9 / 2f;
+                        Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
+
+                        boardPreview.Add(new(
+                            menu,
+                            this,
+                            topCenter - new Vector2(0, 700f) + new Vector2(topLeft + i * butSize + butSize / 2f + (175f - BingoHooks.GlobalBoard.size / 2f * butSize / 2f), -topLeft - j * butSize - butSize / 2f),
+                            new Vector2(butSize, butSize),
+                            i + " " + j,
+                            i,
+                            j)
+                        {
+                            challenge = draftoutChallenges.Last(),
+                        });
+                        boardPreview.Last().challenge.UpdateDescription();
+                        boardPreview.Last().buttonBehav.greyedOut = true;
+                        subObjects.Add(boardPreview.Last());
+                    }
+
+                    if (draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2)
+                    {
+                        BingoHooks.GlobalBoard.recreateList = draftoutChallenges;
+                        BingoHooks.GlobalBoard.RecreateFromList();
+                        grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
+                        subObjects.Add(grid);
+                        gameControls.draftoutButton.greyedOut = false;
+                        draftoutChallenges.Clear();
+                        if (timer != null)
+                        {
+                            timer.RemoveSprites();
+                            RecursiveRemoveSelectables(timer);
+                            subObjects.Remove(timer);
+                            timer = null;
+                        }
+                        if (goal1 != null)
+                        {
+                            goal1.RemoveSprites();
+                            RecursiveRemoveSelectables(goal1);
+                            subObjects.Remove(goal1);
+                        }
+                        if (goal2 != null)
+                        {
+                            goal2.RemoveSprites();
+                            RecursiveRemoveSelectables(goal2);
+                            subObjects.Remove(goal2);
+                        }
+                        foreach (BingoButton but in boardPreview)
+                        {
+                            but.RemoveSprites();
+                            RecursiveRemoveSelectables(but);
+                            subObjects.Remove(but);
+                        }
+                        boardPreview.Clear();
+                    }
+                    else
+                    {
+                        time = draftoutStage % 2 == 1 ? 5 : 1;
+                    }
                 }
-                timer.text = TimeSpan.FromSeconds(time2).ToString(@"mm\:ss\:fff");
+                if (timer != null)
+                {
+                    timer.text = TimeSpan.FromSeconds(time2).ToString(@"mm\:ss\:fff");
+                }
             }
 
             if (title.element == watcherTitle && BingoData.slugcatPlayer != SlugNameWatcher.Watcher)
@@ -618,11 +697,14 @@ namespace BingoMode.BingoMenu
 
             if (message == "LEAVE_LOBBY")
             {
-                if (grid == null)
+                if (BingoData.globalSettings.gamemode == BingoData.BingoGameMode.Draftout)
                 {
-                    grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
-                    subObjects.Add(grid);
-                    BingoHooks.GlobalBoard.GenerateBoard(5);
+                    if (grid == null)
+                    {
+                        grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
+                        subObjects.Add(grid);
+                        BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size);
+                    }
 
                     // gameControls.tabWrapper.wrappers.Remove(gameControls.draftoutButton);
                     // gameControls.tabWrapper.subObjects.Remove(gameControls.draftoutWrapper);
@@ -645,14 +727,21 @@ namespace BingoMode.BingoMenu
                     {
                         goal1.RemoveSprites();
                         RecursiveRemoveSelectables(goal1);
-                        subObjects.Remove(goal2);
+                        subObjects.Remove(goal1);
                     }
                     if (goal2 != null)
                     {
                         goal2.RemoveSprites();
                         RecursiveRemoveSelectables(goal2);
-                        subObjects.Remove(goal1);
+                        subObjects.Remove(goal2);
                     }
+                    foreach (BingoButton but in boardPreview)
+                    {
+                        but.RemoveSprites();
+                        RecursiveRemoveSelectables(but);
+                        subObjects.Remove(but);
+                    }
+                    boardPreview.Clear();
                 }
                 SteamTest.LeaveLobby();
                 SteamTest.GetJoinableLobbies();
@@ -714,9 +803,15 @@ namespace BingoMode.BingoMenu
                 if (timer == null)
                 {
                     Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
-                    timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 500f), default, true, null);
+                    timer = new MenuLabel(menu, owner, "", topCenter - new Vector2(0, 400f), default, true, null);
                     timer.label.color = new Color(0.85f, 0.85f, 0.85f);
                     timer.label.shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
+                    if (grid != null)
+                    {
+                        grid.RemoveSprites();
+                        RemoveSubObject(grid);
+                        grid = null;
+                    }
                 }
                 subObjects.Add(timer);
                 return;

@@ -268,8 +268,18 @@ namespace BingoMode.BingoMenu
         public override void Clicked()
         {
             Singal(this, singalText);
-            menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
-            menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
+            if (BingoData.globalSettings.gamemode == BingoData.BingoGameMode.Draftout)
+            {
+                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.isDraftout)
+                {
+                    page.selectedChallenge = challenge;
+                }
+            }
+            else
+            {
+                menu.manager.ShowDialog(new CustomizerDialog(menu.manager, this));
+                menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
+            }
         }
 
         public void UpdateText()
