@@ -39,11 +39,11 @@ namespace BingoMode.BingoMenu
         internal MenuLabel timer;
         float time = 0;
         float time2 = 0;
-        internal int draftoutStage = 0;
+        internal int draftoutStage = -1;
         internal BingoButton goal1;
         internal BingoButton goal2;
         internal List<Challenge> draftoutChallenges = [];
-        public bool isDraftout => draftoutStage > 0 && draftoutStage < BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2;
+        public bool isDraftout => draftoutStage >= 0 && draftoutStage < BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2;
         public Challenge selectedChallenge;
         public List<BingoButton> boardPreview = [];
 
@@ -593,7 +593,7 @@ namespace BingoMode.BingoMenu
                         subObjects.Remove(but);
                     }
                     boardPreview.Clear();
-                    draftoutStage = 0;
+                    draftoutStage = -1; // Reset value in LobbyData when host leaves somehow?
                 }
                 SteamTest.LeaveLobby();
                 SteamTest.GetJoinableLobbies();
@@ -866,7 +866,7 @@ namespace BingoMode.BingoMenu
                         // If someone leaves mid draft, loses all of preview, but not gonna send the entire board for just a preview
                     }
 
-                    if (draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2 || draftoutStage == 0)
+                    if (draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2 || draftoutStage == -1)
                     {
                         grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
                         subObjects.Add(grid);
@@ -898,7 +898,7 @@ namespace BingoMode.BingoMenu
                             subObjects.Remove(but);
                         }
                         boardPreview.Clear();
-                        draftoutStage = 0;
+                        draftoutStage = -1;
                     }
                 }
             }
@@ -1060,7 +1060,7 @@ namespace BingoMode.BingoMenu
                             subObjects.Remove(but);
                         }
                         boardPreview.Clear();
-                        draftoutStage = 0;
+                        draftoutStage = -1;
                     }
                     else
                     {

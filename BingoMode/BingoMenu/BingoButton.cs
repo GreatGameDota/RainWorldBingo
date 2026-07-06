@@ -268,12 +268,9 @@ namespace BingoMode.BingoMenu
         public override void Clicked()
         {
             Singal(this, singalText);
-            if (BingoData.globalSettings.gamemode == BingoData.BingoGameMode.Draftout)
+            if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.isDraftout)
             {
-                if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.isDraftout)
-                {
-                    page.selectedChallenge = challenge;
-                }
+                page.selectedChallenge = challenge;
             }
             else
             {

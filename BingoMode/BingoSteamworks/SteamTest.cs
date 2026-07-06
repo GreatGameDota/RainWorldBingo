@@ -597,11 +597,11 @@ namespace BingoMode.BingoSteamworks
                 if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2))
                 {
                     int newStage = int.Parse(draftoutStage);
-                    if (page2.draftoutStage == 0 && newStage != 0)
+                    if (page2.draftoutStage == -1 && newStage != -1)
                     {
                         page2.Singal(null, "DRAFTOUT");
                     }
-                    page2.draftoutStage = newStage;
+                    // page2.draftoutStage = newStage;
                 }
 
                 FetchLobbySettings();
