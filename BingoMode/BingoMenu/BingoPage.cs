@@ -775,25 +775,30 @@ namespace BingoMode.BingoMenu
         {
             if (timer != null && (time > 0 || time2 > 0) && !isHost)
             {
-                time = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime"));
-                time2 = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime2"));
+                float.TryParse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime"), out time);
+                float.TryParse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime2"), out time2);
                 int oldStage = draftoutStage;
                 draftoutStage = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutStage"));
                 if (oldStage != draftoutStage)
                 {
                     if (draftoutStage % 2 == 1)
                     {
-                        string[] array11 = Regex.Split(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutGoal1"), "~");
+                        time2 = 0; // SteamLobby will sometimes keep time2 value (changed stage before setting time2 to 0 so its value is 0.0002)
+                        string chal = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutGoal1");
+                        string[] array11 = Regex.Split(chal, "~");
                         string type = array11[0];
                         string text2 = array11[1];
                         Challenge _goal1 = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
                         _goal1.FromString(text2);
+                        _goal1.UpdateDescription();
 
-                        array11 = Regex.Split(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutGoal2"), "~");
+                        string chal2 = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutGoal2");
+                        array11 = Regex.Split(chal2, "~");
                         type = array11[0];
                         text2 = array11[1];
                         Challenge _goal2 = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
                         _goal2.FromString(text2);
+                        _goal2.UpdateDescription();
 
                         int i = 0, j = 0;
                         float butSize = 250;
@@ -824,7 +829,7 @@ namespace BingoMode.BingoMenu
                         subObjects.Add(goal1);
                         subObjects.Add(goal2);
                     }
-                    else
+                    else if (draftoutStage != -1)
                     {
                         // Check if on picking team and update lobby settings? but only 1 person does that?
                         // if (selectedChallenge != null)
@@ -839,7 +844,7 @@ namespace BingoMode.BingoMenu
 
                         string[] array11 = Regex.Split(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutSelectedGoal"), "~");
                         string type = array11[0];
-                        string text2 = array11[1];
+                        string text2 = array11[1]; // This will error if u join mid-draft
                         Challenge _goal1 = (Challenge)Activator.CreateInstance(BingoData.availableBingoChallenges.Find((Challenge c) => c.GetType().Name == type).GetType());
                         _goal1.FromString(text2);
 
@@ -901,6 +906,17 @@ namespace BingoMode.BingoMenu
                         draftoutStage = -1;
                     }
                 }
+                if (time == 0 && time2 == 0 && draftoutStage != -1) // Buffer waiting for next msg (steam sends updates too fast)
+                {
+                    if (oldStage != draftoutStage)
+                    {
+                        time = 1;
+                    }
+                    else
+                    {
+                        time2 = 1;
+                    }
+                }
             }
 
             if (timer != null && time > 0)
@@ -909,15 +925,20 @@ namespace BingoMode.BingoMenu
                 {
                     time -= timeStacker / 40;
                 }
-                if (time < 0)
+                if (time < 0 || selectedChallenge != null) // guess first person on a team to pick is what is picked
                 {
                     time = 0;
                     time2 = 1; // buffer time
+                }
+                else
+                {
+                    time2 = 0; // SteamLobby can send 0.002 time2 and 1 time, so clear time2
                 }
                 if (isHost)
                 {
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime", time.ToString());
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime2", time2.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
                 }
                 timer.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss\:fff");
             }
@@ -1069,22 +1090,31 @@ namespace BingoMode.BingoMenu
                     if (isHost)
                     {
                         SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal1", goal1?.ToString());
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal2", goal2?.ToString());
+                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal1", goal1?.challenge?.ToString());
+                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal2", goal2?.challenge?.ToString());
                         SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutBoardPreviewLength", boardPreview.Count.ToString());
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutSelectedGoal", boardPreview.LastOrDefault()?.ToString());
+                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutSelectedGoal", boardPreview.LastOrDefault()?.challenge?.ToString());
                     }
                 }
                 if (isHost)
                 {
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime", time.ToString());
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime2", time2.ToString());
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
                 }
                 if (timer != null)
                 {
                     timer.text = TimeSpan.FromSeconds(time2).ToString(@"mm\:ss\:fff");
                 }
             }
+
+            // Fallback for when lobby doesn't sync with host at end of draft (not sure why this happens?)
+            // if (isHost && draftoutStage == -1 && int.TryParse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutStage"), out int lobbyStage) && lobbyStage != -1)
+            // {
+            //     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime", time.ToString());
+            //     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime2", time2.ToString());
+            //     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
+            // }
         }
     }
 }

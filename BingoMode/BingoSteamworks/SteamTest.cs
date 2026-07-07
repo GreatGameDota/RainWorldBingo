@@ -601,7 +601,6 @@ namespace BingoMode.BingoSteamworks
                     {
                         page2.Singal(null, "DRAFTOUT");
                     }
-                    // page2.draftoutStage = newStage;
                 }
 
                 FetchLobbySettings();
