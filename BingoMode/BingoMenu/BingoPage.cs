@@ -48,6 +48,7 @@ namespace BingoMode.BingoMenu
         public Challenge selectedChallenge;
         public List<BingoButton> boardPreview = [];
         private List<int> teamsInDraftout = [];
+        float accumulator = 0;
 
         private FSprite title;
         private SymbolButton back;
@@ -591,12 +592,14 @@ namespace BingoMode.BingoMenu
                         goal1.RemoveSprites();
                         RecursiveRemoveSelectables(goal1);
                         subObjects.Remove(goal1);
+                        goal1 = null;
                     }
                     if (goal2 != null)
                     {
                         goal2.RemoveSprites();
                         RecursiveRemoveSelectables(goal2);
                         subObjects.Remove(goal2);
+                        goal2 = null;
                     }
                     foreach (BingoButton but in boardPreview)
                     {
@@ -666,6 +669,7 @@ namespace BingoMode.BingoMenu
             {
                 time = 5;
                 draftoutStage = 0;
+                accumulator = 0;
                 if (timer == null)
                 {
                     Vector2 topCenter = new(menu.manager.rainWorld.screenSize.x / 2f, menu.manager.rainWorld.screenSize.y - TITLE_MARGIN);
@@ -699,6 +703,9 @@ namespace BingoMode.BingoMenu
                     teamsInDraftout.Sort();
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftingTeam", teamsInDraftout[0].ToString());
                 }
+
+                SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutOver", false.ToString());
+                SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "draftoutClientSelectedGoal", "");
 
                 subObjects.Add(timer);
                 subObjects.Add(draftTeam);
@@ -809,18 +816,32 @@ namespace BingoMode.BingoMenu
 
         private void RenderDraftoutUI(float timeStacker, bool isHost)
         {
+            if ((accumulator + timeStacker) % 100 < accumulator && isHost && draftoutStage == -1)
+            {
+                string raw = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutOver");
+                if (bool.Parse(raw))
+                {
+                    SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutOver", true.ToString());
+                    Plugin.logger.LogInfo("resent");
+                }
+            }
+
             if (timer != null && (time > 0 || time2 > 0) && !isHost)
             {
                 float.TryParse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime"), out time);
                 float.TryParse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutTime2"), out time2);
                 int oldStage = draftoutStage;
                 draftoutStage = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutStage"));
-                Plugin.logger.LogInfo("Draftout stage updated to " + draftoutStage + " " + oldStage + " " + time + " " + time2);
+                bool isOver = bool.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutOver"));
+                if (isOver)
+                    draftoutStage = -1;
+                Plugin.logger.LogInfo("Draftout stage updated to " + draftoutStage + " " + oldStage + " " + time + " " + time2 + " " + isOver);
                 if (oldStage != draftoutStage)
                 {
                     if (draftoutStage % 2 == 1)
                     {
                         time2 = 0; // SteamLobby will sometimes keep time2 value (changed stage before setting time2 to 0 so its value is 0.0002)
+
                         string chal = SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutGoal1");
                         string[] array11 = Regex.Split(chal, "~");
                         string type = array11[0];
@@ -899,7 +920,7 @@ namespace BingoMode.BingoMenu
                         // If someone leaves mid draft, loses all of preview, but not gonna send the entire board for just a preview
                     }
 
-                    if (draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2 || draftoutStage == -1)
+                    if (draftoutStage == -1)
                     {
                         grid = new BingoGrid(BingoData.globalMenu, this, new(BingoData.globalMenu.manager.rainWorld.screenSize.x / 2f, BingoData.globalMenu.manager.rainWorld.screenSize.y / 2f), 500f);
                         subObjects.Add(grid);
@@ -925,12 +946,14 @@ namespace BingoMode.BingoMenu
                             goal1.RemoveSprites();
                             RecursiveRemoveSelectables(goal1);
                             subObjects.Remove(goal1);
+                            goal1 = null;
                         }
                         if (goal2 != null)
                         {
                             goal2.RemoveSprites();
                             RecursiveRemoveSelectables(goal2);
                             subObjects.Remove(goal2);
+                            goal2 = null;
                         }
                         foreach (BingoButton but in boardPreview)
                         {
@@ -983,7 +1006,6 @@ namespace BingoMode.BingoMenu
                     }
                 }
 
-                Plugin.logger.LogInfo("'" + selectedGoal + "'");
                 if (time < 0 || selectedChallenge != null || selectedGoal != "") // guess first person on a team to pick is what is picked
                 {
                     if (selectedChallenge == null && selectedGoal != "")
@@ -1007,7 +1029,7 @@ namespace BingoMode.BingoMenu
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime2", time2.ToString());
                     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
                 }
-                timer.text = TimeSpan.FromSeconds(time).ToString(@"mm\:ss\:fff");
+                timer.text = TimeSpan.FromSeconds(time).ToString(@"ss\.f\s");
             }
             else if (timer != null && time2 > 0)
             {
@@ -1090,6 +1112,8 @@ namespace BingoMode.BingoMenu
                         else if (goal1 != null && goal2 != null)
                         {
                             draftoutChallenges.Add(UnityEngine.Random.value < 0.5f ? goal1.challenge : goal2.challenge);
+                            goal1 = null;
+                            goal2 = null;
                         }
 
                         int currTeam = int.Parse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftingTeam"));
@@ -1119,6 +1143,14 @@ namespace BingoMode.BingoMenu
 
                     if (isHost && draftoutStage == BingoHooks.GlobalBoard.size * BingoHooks.GlobalBoard.size * 2)
                     {
+                        ExpeditionData.ClearActiveChallengeList(); // Previous selection still populating active chals
+                        foreach (Challenge ch in draftoutChallenges)
+                        {
+                            if (!ExpeditionData.challengeList.Contains(ch))
+                            {
+                                ExpeditionData.challengeList.Add(ch);
+                            }
+                        }
                         BingoHooks.GlobalBoard.recreateList = draftoutChallenges;
                         BingoHooks.GlobalBoard.RecreateFromList();
                         SteamTest.UpdateOnlineBingo();
@@ -1147,12 +1179,14 @@ namespace BingoMode.BingoMenu
                             goal1.RemoveSprites();
                             RecursiveRemoveSelectables(goal1);
                             subObjects.Remove(goal1);
+                            goal1 = null;
                         }
                         if (goal2 != null)
                         {
                             goal2.RemoveSprites();
                             RecursiveRemoveSelectables(goal2);
                             subObjects.Remove(goal2);
+                            goal2 = null;
                         }
                         foreach (BingoButton but in boardPreview)
                         {
@@ -1162,18 +1196,24 @@ namespace BingoMode.BingoMenu
                         }
                         boardPreview.Clear();
                         draftoutStage = -1;
+                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutOver", true.ToString());
                     }
                     else
                     {
-                        time = draftoutStage % 2 == 1 ? 5 : 1;
+                        time = draftoutStage % 2 == 1 ? 10 : 1;
                     }
                     if (isHost)
                     {
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal1", goal1?.challenge?.ToString());
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal2", goal2?.challenge?.ToString());
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutBoardPreviewLength", boardPreview.Count.ToString());
-                        SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutSelectedGoal", boardPreview.LastOrDefault()?.challenge?.ToString());
+                        // SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
+                        if (goal1 != null)
+                        {
+                            SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal1", goal1?.challenge?.ToString());
+                            SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftOutGoal2", goal2?.challenge?.ToString());
+                        }
+                        if (draftoutStage != -1)
+                        {
+                            SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutSelectedGoal", boardPreview.LastOrDefault()?.challenge?.ToString());
+                        }
                     }
                 }
                 if (isHost)
@@ -1184,7 +1224,7 @@ namespace BingoMode.BingoMenu
                 }
                 if (timer != null)
                 {
-                    timer.text = TimeSpan.FromSeconds(time2).ToString(@"mm\:ss\:fff");
+                    timer.text = TimeSpan.FromSeconds(time2).ToString(@"ss\.f\s");
                 }
             }
 
@@ -1194,12 +1234,21 @@ namespace BingoMode.BingoMenu
             }
 
             // Fallback for when lobby doesn't sync with host at end of draft (not sure why this happens?)
-            // if (isHost && draftoutStage == -1 && int.TryParse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutStage"), out int lobbyStage) && lobbyStage != -1)
+            // int.TryParse(SteamMatchmaking.GetLobbyData(SteamTest.CurrentLobby, "draftoutStage"), out int lobbyStage);
+            // Plugin.logger.LogInfo(draftoutStage + " " + lobbyStage + " " + time + " " + time2);
+            // if (isHost && draftoutStage == -1 && lobbyStage != -1)
             // {
             //     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime", time.ToString());
             //     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutTime2", time2.ToString());
             //     SteamMatchmaking.SetLobbyData(SteamTest.CurrentLobby, "draftoutStage", draftoutStage.ToString());
             // }
+
+            if (isHost && isDraftout)
+            {
+                gameControls.draftoutButton.greyedOut = true;
+            }
+
+            accumulator = (accumulator + timeStacker) % 100;
         }
     }
 }
