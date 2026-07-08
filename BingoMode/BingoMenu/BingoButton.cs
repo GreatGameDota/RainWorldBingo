@@ -270,7 +270,15 @@ namespace BingoMode.BingoMenu
             Singal(this, singalText);
             if (BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page) && page.isDraftout)
             {
-                page.selectedChallenge = challenge;
+                var isHost = SteamTest.selfIdentity.GetSteamID() == SteamMatchmaking.GetLobbyOwner(SteamTest.CurrentLobby);
+                if (!isHost)
+                {
+                    SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "draftoutClientSelectedGoal", page.draftoutStage + ";" + challenge.ToString());
+                }
+                else
+                {
+                    page.selectedChallenge = challenge;
+                }
             }
             else
             {

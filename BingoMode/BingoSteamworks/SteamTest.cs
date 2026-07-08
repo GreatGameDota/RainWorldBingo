@@ -594,7 +594,7 @@ namespace BingoMode.BingoSteamworks
                 // }
 
                 string draftoutStage = SteamMatchmaking.GetLobbyData(CurrentLobby, "draftoutStage");
-                if (draftoutStage != "" && draftoutStage != null && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2))
+                if (draftoutStage != "" && BingoData.globalMenu != null && BingoHooks.bingoPage.TryGetValue(BingoData.globalMenu, out var page2))
                 {
                     int newStage = int.Parse(draftoutStage);
                     if (page2.draftoutStage == -1 && newStage != -1)
