@@ -275,10 +275,7 @@ namespace BingoMode.BingoMenu
                 {
                     SteamMatchmaking.SetLobbyMemberData(SteamTest.CurrentLobby, "draftoutClientSelectedGoal", page.draftoutStage + ";" + challenge.ToString());
                 }
-                else
-                {
-                    page.selectedChallenge = challenge;
-                }
+                page.selectedChallenge = challenge;
             }
             else
             {
