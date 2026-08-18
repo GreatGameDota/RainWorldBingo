@@ -238,6 +238,12 @@ namespace BingoMode
             // Add sofanthiel as playable char
             On.Expedition.ExpeditionData.GetPlayableCharacters += ExpeditionData_GetPlayableCharacters;
             On.Menu.CharacterSelectPage.GetSlugcatPortrait += CharacterSelectPage_GetSlugcatPortrait;
+            
+            // Make collectible tokens appear for Inv
+            On.CollectToken.AvailableToPlayer += CollectTokenOnAvailableToPlayer;
+            IL.CollectToken.CollectTokenData.ctor += CollectTokenDataOverrideHiddenOrUnplayable;
+            IL.CollectToken.CollectTokenData.ToString += CollectTokenDataOverrideHiddenOrUnplayable;
+            IL.CollectToken.CollectTokenData.FromString += CollectTokenDataOverrideHiddenOrUnplayable;
 
             // Shift the position of the kills in menu
             On.Menu.SleepAndDeathScreen.Update += SleepAndDeathScreen_Update;
@@ -940,6 +946,38 @@ namespace BingoMode
             else
             {
                 return orig(self, slugcat, pos);
+            }
+        }
+        
+        private static bool CollectTokenOnAvailableToPlayer(On.CollectToken.orig_AvailableToPlayer orig, CollectToken self)
+        {
+            // Is Bingo and MSC and Inv and token can appear for Inv
+            return orig(self) || BingoData.BingoMode 
+                && ModManager.MSC 
+                && ExpeditionData.slugcatPlayer == SlugNameMSC.Sofanthiel 
+                && (self.placedObj.data as CollectToken.CollectTokenData)!.availableToPlayers.Contains(ExpeditionData.slugcatPlayer);
+        }
+
+        private static void CollectTokenDataOverrideHiddenOrUnplayable(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            // Find the first occurrence of HiddenOrUnplayable check and append new condition
+            int localIndex = -1;
+            c.GotoNext(
+                MoveType.After,
+                x => x.MatchLdloc(out localIndex),
+                x => x.MatchCallOrCallvirt(typeof(SlugcatStats).GetMethod(nameof(SlugcatStats.HiddenOrUnplayableSlugcat)))
+            );
+
+            c.Emit(OpCodes.Ldloc, localIndex); // Slugcat that was passed into method
+            c.EmitDelegate(HiddenOrUnplayableAndNotInv);
+            return;
+
+            static bool HiddenOrUnplayableAndNotInv(bool isHiddenOrUnplayable, SlugName slugcat)
+            {
+                if (!BingoData.BingoMode) return isHiddenOrUnplayable;
+                return isHiddenOrUnplayable && (!ModManager.MSC || slugcat != SlugNameMSC.Sofanthiel);
             }
         }
 
