@@ -135,13 +135,14 @@ namespace BingoMode.BingoChallenges
             gibacj:
             List<string> aggregate = new List<string>();
 
-            if (BingoData.slugcatPlayer == SlugNameWatcher.Watcher)
+            var slug = ExpeditionData.slugcatPlayer == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode ? SlugNameMSC.Gourmand : ExpeditionData.slugcatPlayer;
+            if (slug == SlugNameWatcher.Watcher)
             {
                 aggregate.AddRange([..BingoData.possibleTokens[0], ..BingoData.possibleTokens[1], ..BingoData.possibleTokens[3]]);
             }
             else
             {
-                int count = ModManager.MSC ? (SlugcatStats.IsSlugcatFromMSC(ExpeditionData.slugcatPlayer) ? 4 : 3) : 2;
+                int count = ModManager.MSC ? (SlugcatStats.IsSlugcatFromMSC(slug) ? 4 : 3) : 2;
                 for (int i = 0; i < count; i++)
                 {
                     aggregate.AddRange(BingoData.possibleTokens[i]);
@@ -152,20 +153,20 @@ namespace BingoMode.BingoChallenges
             unl = aggregate[UnityEngine.Random.Range(0, aggregate.Count)];
             if (unl.ToLowerInvariant().StartsWith("ms"))
             {
-                if (ExpeditionData.slugcatPlayer.value == "Rivulet" || ExpeditionData.slugcatPlayer.value == "Saint") { }
+                if (slug.value == "Rivulet" || slug.value == "Saint") { }
                 else goto gibacj;
             }
             if (unl.ToLowerInvariant().StartsWith("ds") || unl.ToLowerInvariant().StartsWith("sh"))
             {
-                if (ExpeditionData.slugcatPlayer.value == "Saint") goto gibacj;
+                if (slug.value == "Saint") goto gibacj;
             }
             if (unl.ToLowerInvariant().StartsWith("oe"))
             {
-                if (ExpeditionData.slugcatPlayer.value != "Gourmand" || ExpeditionData.slugcatPlayer.value != "White" || ExpeditionData.slugcatPlayer.value != "Yellow") goto gibacj;
+                if (slug.value != "Gourmand" || slug.value != "White" || slug.value != "Yellow") goto gibacj;
             }
             if (unl.ToLowerInvariant().Equals("kingvulture"))
             {
-                if (ExpeditionData.slugcatPlayer.value != "Red" || ExpeditionData.slugcatPlayer.value != "Gourmand" || ExpeditionData.slugcatPlayer.value != "Artificer") goto gibacj;
+                if (slug.value != "Red" || slug.value != "Gourmand" || slug.value != "Artificer") goto gibacj;
             }
 
             if (unl == "ERROR") return null;

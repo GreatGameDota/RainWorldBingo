@@ -114,7 +114,7 @@ namespace BingoMode.BingoChallenges
         public override bool ValidForThisBingoSlugcat(SlugName slugcat, BingoData.BingoModifier modifier)
         {
             return ModManager.MSC && modifier == BingoData.BingoModifier.Normal &&
-                (slugcat == SlugName.Red || slugcat == SlugNameMSC.Gourmand || slugcat == SlugName.White || slugcat == SlugName.Yellow);
+                (slugcat == SlugName.Red || slugcat == SlugNameMSC.Gourmand || slugcat == SlugName.White || slugcat == SlugName.Yellow || slugcat == SlugNameWatcher.Watcher);
         }
 
         public override string ToString()

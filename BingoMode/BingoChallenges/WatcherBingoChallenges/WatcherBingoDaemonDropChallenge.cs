@@ -90,7 +90,7 @@ namespace BingoMode.BingoChallenges.WatcherBingoChallenges
 
         public override bool ValidForThisBingoSlugcat(SlugName slugcat, BingoData.BingoModifier modifier)
         {
-            return slugcat == SlugNameWatcher.Watcher;
+            return modifier == BingoData.BingoModifier.WatcherMode && slugcat == SlugNameWatcher.Watcher;
         }
 
         public override string ToString()

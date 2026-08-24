@@ -89,7 +89,8 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            string[] slugcatStoryRegions = SlugcatStats.SlugcatStoryRegions(ExpeditionData.slugcatPlayer).ToArray();
+            var slug = ExpeditionData.slugcatPlayer == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode ? SlugNameMSC.Gourmand : ExpeditionData.slugcatPlayer;
+            string[] slugcatStoryRegions = SlugcatStats.SlugcatStoryRegions(slug).ToArray();
             List<string> list = new List<string>();
             for (int i = 0; i < slugcatStoryRegions.Length; i++)
             {
@@ -123,7 +124,7 @@ namespace BingoMode.BingoChallenges
 
         public override bool ValidForThisBingoSlugcat(SlugName slugcat, BingoData.BingoModifier modifier)
         {
-            return modifier == BingoData.BingoModifier.Normal && slugcat != SlugNameMSC.Saint && slugcat != SlugName.Yellow && slugcat != SlugNameWatcher.Watcher;
+            return modifier == BingoData.BingoModifier.Normal && slugcat != SlugNameMSC.Saint && slugcat != SlugName.Yellow;
         }
 
         public override bool CombatRequired()

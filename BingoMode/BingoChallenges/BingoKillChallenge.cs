@@ -160,7 +160,8 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             float diff = UnityEngine.Random.value;
-            ChallengeTools.ExpeditionCreature expeditionCreature = ChallengeTools.GetExpeditionCreature(BingoData.slugcatPlayer, diff);
+            var slug = BingoData.slugcatPlayer == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode ? SlugNameMSC.Gourmand : BingoData.slugcatPlayer;
+            ChallengeTools.ExpeditionCreature expeditionCreature = ChallengeTools.GetExpeditionCreature(slug, diff);
 
             int maxAttempts = 50;
 
@@ -168,12 +169,12 @@ namespace BingoMode.BingoChallenges
             {
                 if (expeditionCreature != null && expeditionCreature.creature.value != "Frog") break;
 
-                expeditionCreature = ChallengeTools.GetExpeditionCreature(BingoData.slugcatPlayer, diff);
+                expeditionCreature = ChallengeTools.GetExpeditionCreature(slug, diff);
             }
 
             if (expeditionCreature == null)
             {
-                expeditionCreature = ChallengeTools.GetExpeditionCreature(BingoData.slugcatPlayer, diff);
+                expeditionCreature = ChallengeTools.GetExpeditionCreature(slug, diff);
             }
 
             int num = (int)Mathf.Lerp(1f, 10f, (float)Math.Pow(diff, 2.5));

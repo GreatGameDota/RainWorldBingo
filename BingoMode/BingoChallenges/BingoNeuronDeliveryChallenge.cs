@@ -53,8 +53,7 @@ namespace BingoMode.BingoChallenges
         public override bool ValidForThisBingoSlugcat(SlugName slugcat, BingoData.BingoModifier modifier)
         {
             return modifier == BingoData.BingoModifier.Normal
-                && (!ModManager.MSC || (slugcat != SlugNameMSC.Spear && slugcat != SlugNameMSC.Saint && slugcat != SlugNameMSC.Artificer))
-                && (!ModManager.Watcher || slugcat != SlugNameWatcher.Watcher);
+                && (!ModManager.MSC || (slugcat != SlugNameMSC.Spear && slugcat != SlugNameMSC.Saint && slugcat != SlugNameMSC.Artificer));
         }
 
         public override void UpdateDescription()

@@ -257,6 +257,9 @@ namespace BingoMode.BingoMenu
 
         public static string ExpeditionRandomStartsUnlocked(RainWorld rainWorld, SlugName slug)
         {
+            if (slug == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode)
+                slug = SlugNameMSC.Gourmand;
+
             Dictionary<string, int> dictionary = new Dictionary<string, int>();
             Dictionary<string, List<string>> dictionary2 = new Dictionary<string, List<string>>();
             List<string> list2 = SlugcatStats.SlugcatStoryRegions(slug);

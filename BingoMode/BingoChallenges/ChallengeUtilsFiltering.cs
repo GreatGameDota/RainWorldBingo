@@ -42,11 +42,12 @@ namespace BingoMode.BingoChallenges
         public static string[] GetFilteredList(string listname, string[] origList, bool sorted)
         {
             BingoModifier mode = BingoData.GetBingoModifier();
-            var key = (mode, listname, ExpeditionData.slugcatPlayer, sorted);
+            var slug = ExpeditionData.slugcatPlayer == watchername && mode != BingoModifier.WatcherMode ? gourname : ExpeditionData.slugcatPlayer;
+            var key = (mode, listname, slug, sorted);
 
             if (cache.TryGetValue(key, out var cached)) return cached;
 
-            string[] result = ListRules[listname](ExpeditionData.slugcatPlayer, mode, origList);
+            string[] result = ListRules[listname](slug, mode, origList);
 
             if (sorted) result = result.Distinct().OrderBy(x => x).ToArray();
 

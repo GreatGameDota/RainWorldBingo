@@ -92,7 +92,8 @@ namespace BingoMode.BingoChallenges
         public override Challenge Generate()
         {
             float diff = UnityEngine.Random.value;
-            ChallengeTools.ExpeditionCreature expeditionCreature = ChallengeTools.GetExpeditionCreature(BingoData.slugcatPlayer, diff);
+            var slug = BingoData.slugcatPlayer == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode ? SlugNameMSC.Gourmand : BingoData.slugcatPlayer;
+            ChallengeTools.ExpeditionCreature expeditionCreature = ChallengeTools.GetExpeditionCreature(slug, diff);
             return new BingoDontKillChallenge
             {
                 victim = new(expeditionCreature.creature.value, "Creature Type", 0, listName: ChallengeListConstants.Creatures),

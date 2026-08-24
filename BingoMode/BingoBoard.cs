@@ -41,7 +41,8 @@ namespace BingoMode
         {
             BingoRandomizationProfile.Reset();
             Challenge[,] ghostGrid = new Challenge[size, size];
-            BingoData.FillPossibleTokens(BingoData.slugcatPlayer);
+            var slug = BingoData.slugcatPlayer == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode ? SlugNameMSC.Gourmand : BingoData.slugcatPlayer;
+            BingoData.FillPossibleTokens(slug);
             ExpeditionData.ClearActiveChallengeList();
             if (changeSize)
                 ghostGrid = challengeGrid;
@@ -676,7 +677,8 @@ namespace BingoMode
             }
 
             BingoPage.WatcherModeUIUpdate(false, (BingoData.WatcherMode != currentWatcherMode));
-            BingoData.FillPossibleTokens(BingoData.slugcatPlayer);
+            var curSlug = BingoData.slugcatPlayer == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode ? SlugNameMSC.Gourmand : BingoData.slugcatPlayer;
+            BingoData.FillPossibleTokens(curSlug);
 
             ExpeditionMenu self = BingoData.globalMenu;
             if (self != null && BingoHooks.bingoPage.TryGetValue(self, out var page))
