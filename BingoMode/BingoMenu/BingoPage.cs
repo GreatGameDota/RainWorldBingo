@@ -564,10 +564,6 @@ namespace BingoMode.BingoMenu
                         BingoHooks.GlobalBoard.GenerateBoard(BingoHooks.GlobalBoard.size);
                     }
 
-                    // gameControls.tabWrapper.wrappers.Remove(gameControls.draftoutButton);
-                    // gameControls.tabWrapper.subObjects.Remove(gameControls.draftoutWrapper);
-                    // gameControls.RemoveSubObject(gameControls.draftoutWrapper);
-
                     gameControls.RemoveSprites();
                     RecursiveRemoveSelectables(gameControls);
                     subObjects.Remove(gameControls);
@@ -881,8 +877,28 @@ namespace BingoMode.BingoMenu
                         });
                         boardPreview.Last().challenge.UpdateDescription();
                         boardPreview.Last().buttonBehav.greyedOut = true;
-                        subObjects.Add(boardPreview.Last());
-                        // If someone leaves mid draft, loses all of preview, but not gonna send the entire board for just a preview
+                        subObjects.Add(boardPreview.Last()); // If someone leaves mid draft, loses all of preview, but not gonna send the entire board for just a preview
+
+                        if (goal1 != null)
+                        {
+                            goal1.RemoveSprites();
+                            RecursiveRemoveSelectables(goal1);
+                            subObjects.Remove(goal1);
+                            if (!isHost)
+                            {
+                                goal1 = null;
+                            }
+                        }
+                        if (goal2 != null)
+                        {
+                            goal2.RemoveSprites();
+                            RecursiveRemoveSelectables(goal2);
+                            subObjects.Remove(goal2);
+                            if (!isHost)
+                            {
+                                goal2 = null;
+                            }
+                        }
                     }
 
                     if (draftoutStage == -1)
