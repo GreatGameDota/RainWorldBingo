@@ -210,7 +210,7 @@ namespace BingoMode
         private bool ModApplyer_RequiresRestart(On.ModManager.ModApplyer.orig_RequiresRestart orig, ModManager.ModApplyer self)
         {
             //return orig.Invoke(self);
-            return true;
+            return self.manager.currentMainLoop.ID != ProcessManager.ProcessID.Initialization || orig(self);
         }
     }
 }
