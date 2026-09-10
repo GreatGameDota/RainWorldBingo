@@ -123,7 +123,8 @@ namespace BingoMode.BingoChallenges
 
         public override Challenge Generate()
         {
-            List<ChallengeTools.ExpeditionCreature> randoe = ChallengeTools.creatureSpawns[BingoData.slugcatPlayer.value];
+            var slug = ExpeditionData.slugcatPlayer == SlugNameWatcher.Watcher && BingoData.GetBingoModifier() != BingoData.BingoModifier.WatcherMode ? SlugNameMSC.Gourmand : ExpeditionData.slugcatPlayer;
+            List<ChallengeTools.ExpeditionCreature> randoe = ChallengeTools.creatureSpawns[slug.value];
             bool oneCycle = UnityEngine.Random.value < 0.33f;
 
             string wep = ChallengeUtils.GetCorrectListForChallenge(ChallengeListConstants.Weapons)[UnityEngine.Random.Range(1, ChallengeUtils.GetCorrectListForChallenge(ChallengeListConstants.Weapons).Length)];
