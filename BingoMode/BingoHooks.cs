@@ -1564,7 +1564,6 @@ namespace BingoMode
                     c.Index--;
                     c.Remove();
                     var field = typeof(BingoEnums).GetField(nameof(BingoEnums.MainMenu_Bingo));
-                    //var field = typeof(BingoEnums.SluhvengersScenes).GetField(nameof(BingoEnums.SluhvengersScenes.sluhvengers_1_surmonk));
                     c.Emit(OpCodes.Ldsfld, field);
                 }
                 else Plugin.logger.LogError("BingoMainMenuBackgroundReplacement broked " + il);
