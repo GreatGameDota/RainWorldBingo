@@ -364,4 +364,6 @@ FodyWeavers.xsd
 
 /lib/
 NStrip.exe
-mod/plugins/BingoMode.dll
+/mod/modinfo.json
+/mod/thumbnail.png
+/mod/thumbnail-steam.png

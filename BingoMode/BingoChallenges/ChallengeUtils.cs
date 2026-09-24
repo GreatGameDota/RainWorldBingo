@@ -762,6 +762,7 @@ namespace BingoMode.BingoChallenges
             "GooieDuck",
             "LillyPuck",
             "DandelionPeach",
+            "GlowWeed",
 
             // watcher
             "FireSpriteLarva",

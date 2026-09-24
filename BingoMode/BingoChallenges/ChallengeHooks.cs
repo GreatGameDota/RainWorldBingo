@@ -610,11 +610,19 @@ namespace BingoMode.BingoChallenges
                     if (existingFucker != null)
                     {
                         room.abstractRoom.RemoveEntity(existingFucker);
+                        if (room.game.GetStorySession.saveState.objectTrackers.Any(x => x.obj == existingFucker))
+                        {
+                            room.game.GetStorySession.RemovePersistentTracker(existingFucker as AbstractPhysicalObject);
+                        }
                     }
 
                     AbstractPhysicalObject startItem = new(room.world, MSCItemType.EnergyCell, null, new WorldCoordinate(room.abstractRoom.index, room.shelterDoor.playerSpawnPos.x, room.shelterDoor.playerSpawnPos.y, 0), room.game.GetNewID());
                     room.abstractRoom.entities.Add(startItem);
                     startItem.Realize();
+                    if (AbstractPhysicalObject.UsesAPersistantTracker(startItem) && room.game?.GetStorySession?.saveState?.objectTrackers != null && !room.game.GetStorySession.saveState.objectTrackers.Any(x => x.obj == startItem))
+                    {
+                        room.game.GetStorySession.AddNewPersistentTracker(startItem, room.world);
+                    }
                 });
             }
             else Plugin.logger.LogError("Room_LoadedEnergyCell IL FAILURE " + il);
