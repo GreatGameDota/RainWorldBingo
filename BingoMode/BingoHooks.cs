@@ -613,11 +613,12 @@ namespace BingoMode
                 {
                     if (BingoData.BingoMode)
                     {
-                        string ghost = GhostWorldPresence.GetGhostID(self.region.name).value;
-                        if (ExpeditionData.challengeList.Any(x => x is BingoEchoChallenge))
-                        {
-                            return false;
-                        }
+                        return false; // echoes always work like campaign
+                        //string ghost = GhostWorldPresence.GetGhostID(self.region.name).value;
+                        //if (ExpeditionData.challengeList.Any(x => x is BingoEchoChallenge))
+                        //{
+                        //    return false;
+                        //}
                     }
                     return orig;
                 });
@@ -1563,7 +1564,6 @@ namespace BingoMode
                     c.Index--;
                     c.Remove();
                     var field = typeof(BingoEnums).GetField(nameof(BingoEnums.MainMenu_Bingo));
-                    //var field = typeof(BingoEnums.SluhvengersScenes).GetField(nameof(BingoEnums.SluhvengersScenes.sluhvengers_1_surmonk));
                     c.Emit(OpCodes.Ldsfld, field);
                 }
                 else Plugin.logger.LogError("BingoMainMenuBackgroundReplacement broked " + il);
