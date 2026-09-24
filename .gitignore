@@ -365,5 +365,6 @@ FodyWeavers.xsd
 /lib/
 NStrip.exe
 /mod/modinfo.json
+/mod/bwu.json
 /mod/thumbnail.png
 /mod/thumbnail-steam.png
